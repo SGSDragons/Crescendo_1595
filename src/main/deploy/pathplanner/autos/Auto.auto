@@ -1,0 +1,73 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.6,
+      "y": 7.0
+    },
+    "rotation": -140.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "fire-0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "aim-0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LaunchNoteLow"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "fire-1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "aim-1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LaunchNoteLow"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "fire-2"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
