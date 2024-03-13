@@ -14,8 +14,8 @@ public class LauncherSubsystem extends SubsystemBase{
 
     TalonFX bottomSpinner, middleSpinner, topSpinner;
 
-    private double upperTargetV = 0;
-    private double lowerTargetV = 0;
+    private double upperTargetV = 80;
+    private double lowerTargetV = -80;
 
     VelocityVoltage topVelocity;
     VelocityVoltage middleVelocity;
@@ -40,9 +40,9 @@ public class LauncherSubsystem extends SubsystemBase{
         
         //Re-apply config for tuning.  SHOULD REMOVE BEFORE COMP
         var config = new Slot0Configs();
-        config.kV = SmartDashboard.getNumber("V", 0);
-        config.kP = SmartDashboard.getNumber("p", 0);
-        config.kI = SmartDashboard.getNumber("i", 0);
+        config.kV = SmartDashboard.getNumber("V", 0.14);
+        config.kP = SmartDashboard.getNumber("p", 8.0);
+        config.kI = SmartDashboard.getNumber("i", 0.001);
         config.kD = SmartDashboard.getNumber("d", 0);
         
         upperTargetV = SmartDashboard.getNumber("upperTargetV", 50);
@@ -58,9 +58,9 @@ public class LauncherSubsystem extends SubsystemBase{
         
         //Re-apply config for tuning.  SHOULD REMOVE BEFORE COMP
         var config = new Slot0Configs();
-        config.kV = SmartDashboard.getNumber("V", 0);
-        config.kP = SmartDashboard.getNumber("p", 0);
-        config.kI = SmartDashboard.getNumber("i", 0);
+        config.kV = SmartDashboard.getNumber("V", .14);
+        config.kP = SmartDashboard.getNumber("p", 8.0);
+        config.kI = SmartDashboard.getNumber("i", .001);
         config.kD = SmartDashboard.getNumber("d", 0);
 
         lowerTargetV = SmartDashboard.getNumber("lowerTargetV", -50);
