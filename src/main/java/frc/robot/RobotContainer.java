@@ -53,6 +53,11 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
+  private int launcherkV = 0;
+  private int launcherkp = 0;
+  private int launcherki = 0;
+  private int launcherkd = 0;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -70,6 +75,15 @@ public class RobotContainer {
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+
+    SmartDashboard.putNumber("V", launcherkV);
+    SmartDashboard.putNumber("p", launcherkp);
+    SmartDashboard.putNumber("i", launcherki);
+    SmartDashboard.putNumber("d", launcherkd);
+
+    SmartDashboard.putNumber("upperTargetV", 50);
+    SmartDashboard.putNumber("lowerTargetV", -50);
 
     // Configure button bindings
     configureBindings();

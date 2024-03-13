@@ -74,9 +74,10 @@ public final class Constants {
     public static final int noteAimerReverseChannel = 5;
 
     public static final int indexerMotorCANId = 18;
-    public static final int bottomSpinnerMotorCANId = 15;
-    public static final int middleSpinnerMotorCANId = 16;
-    public static final int topSpinnerMotorCANId = 17;
+    public static final int indexerMotor2CANId = 15;
+    public static final int bottomSpinnerMotorCANId = 19;
+    public static final int middleSpinnerMotorCANId = 17;
+    public static final int topSpinnerMotorCANId = 16;
   }
 
   public static final class SystemToggles {

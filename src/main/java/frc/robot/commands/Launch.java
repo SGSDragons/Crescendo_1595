@@ -45,7 +45,7 @@ public class Launch extends Command {
         launcherSubsystem.spinUpperSpinners();
         break;
       case DROP:
-        launcherSubsystem.spinUpperSpinners(0.1);
+        // launcherSubsystem.spinUpperSpinners(0.1);
         break;
       default: break;
     }

@@ -12,7 +12,7 @@ import com.revrobotics.ColorSensorV3;
 
 public class IndexerSubsystem extends SubsystemBase{
 
-    TalonFX indexerMotor;
+    TalonFX indexerMotor, indexerMotorTwo;
     ColorSensorV3 colorSensor;
     Color percievedColor;
     //DigitalInput beamBreakSensor = new DigitalInput(0); //True when Unimposed
@@ -20,36 +20,48 @@ public class IndexerSubsystem extends SubsystemBase{
 
     public IndexerSubsystem() {
         indexerMotor = new TalonFX(HardwareID.indexerMotorCANId);
+        indexerMotorTwo = new TalonFX(HardwareID.indexerMotor2CANId);
+
         indexerMotor.setNeutralMode(NeutralModeValue.Brake);
+        indexerMotorTwo.setNeutralMode(NeutralModeValue.Brake);
+
         indexerMotor.setInverted(true);
+        indexerMotorTwo.setInverted(false);
+        
         colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
         noteLoaded = false;
     }
 
     public void stopIndexer() {
         indexerMotor.set(0.0);
+        indexerMotorTwo.set(0.0);
     }
 
     public void indexNoteIntake() {
         if (!noteLoaded) {
-            indexerMotor.set(1.0);
+            indexerMotor.set(0.25);
+            indexerMotorTwo.set(0.25);
             return;
         }
 
         indexerMotor.set(0.0);
+        indexerMotorTwo.set(0.0);
     }
 
     public void indexNoteOuttake() {
-        indexerMotor.set(-1.0);
+        indexerMotor.set(-0.25);
+        indexerMotorTwo.set(-0.25);
     }
 
     public void indexNoteLaunch() {
-        indexerMotor.set(1.0);
+        indexerMotor.set(0.25);
+        indexerMotorTwo.set(0.25);
     }
 
     //Used for Testing Purposes
     public void indexNoteIntakeDisregardLoading() {
-        indexerMotor.set(1.0);
+        indexerMotor.set(0.25);
+        indexerMotorTwo.set(0.25);
     }
     
     @Override
