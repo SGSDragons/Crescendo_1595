@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utilities.Constants.HardwareID;
 
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.ColorSensorV3;
@@ -21,47 +22,39 @@ public class IndexerSubsystem extends SubsystemBase{
     public IndexerSubsystem() {
         indexerMotor = new TalonFX(HardwareID.indexerMotorCANId);
         indexerMotorTwo = new TalonFX(HardwareID.indexerMotor2CANId);
-
+        indexerMotorTwo.setControl(new Follower(HardwareID.indexerMotorCANId, true));
+        
         indexerMotor.setNeutralMode(NeutralModeValue.Brake);
-        indexerMotorTwo.setNeutralMode(NeutralModeValue.Brake);
-
         indexerMotor.setInverted(true);
-        indexerMotorTwo.setInverted(false);
         
         colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
         noteLoaded = false;
     }
 
     public void stopIndexer() {
-        indexerMotor.set(0.0);
-        indexerMotorTwo.set(0.0);
+        indexerMotor.setVoltage(0.0);
     }
 
     public void indexNoteIntake() {
         if (!noteLoaded) {
-            indexerMotor.set(0.25);
-            indexerMotorTwo.set(0.25);
+            indexerMotor.setVoltage(SmartDashboard.getNumber("indexerIntakeVoltage", 3.00));
             return;
         }
 
-        indexerMotor.set(0.0);
-        indexerMotorTwo.set(0.0);
+        indexerMotor.setVoltage(0.0);
     }
 
     public void indexNoteOuttake() {
-        indexerMotor.set(-0.25);
-        indexerMotorTwo.set(-0.25);
+        indexerMotor.setVoltage(SmartDashboard.getNumber("indexerOuttakeVoltage", 3.00));
     }
 
     public void indexNoteLaunch() {
-        indexerMotor.set(0.25);
-        indexerMotorTwo.set(0.25);
+        indexerMotor.set(SmartDashboard.getNumber("indexerVoltage", 3.00));
     }
 
     //Used for Testing Purposes
     public void indexNoteIntakeDisregardLoading() {
-        indexerMotor.set(0.25);
-        indexerMotorTwo.set(0.25);
+        indexerMotor.setVoltage(SmartDashboard.getNumber("indexerIntakeVoltage", 3.00));
     }
     
     @Override
@@ -94,5 +87,7 @@ public class IndexerSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Indexer Motor Velocity", indexerMotor.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Note Proximity", colorSensor.getProximity());
         SmartDashboard.putBoolean("Note Loaded", noteLoaded);
+        SmartDashboard.getNumber("indexerVoltage", 3.00);
+        SmartDashboard.getNumber("indexerOuttakeVoltage", 3.00);
     }
 }

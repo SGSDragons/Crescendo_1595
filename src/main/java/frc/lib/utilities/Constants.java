@@ -35,7 +35,7 @@ public final class Constants {
     public static final int operatorControllerPort = 1;
     public static final double stickDeadband = 0.1;
 
-    // Button names
+    // Austin controller button names --> values
     public static final int backLeftSingleSwitch = 1;
     public static final int topLeftToggleBack = 2;
     public static final int topLeftToggleForward = 3;

@@ -47,21 +47,21 @@ public class PneumaticsSubsystem extends SubsystemBase{
 
     //Sets all solenoids on robot to specfic position.
     public void setAllSolenoidsToReverse() {
-        leftClimber.set(Value.kReverse);
-        rightClimber.set(Value.kReverse);
-        noteAimer.set(Value.kReverse);
+        setSolenoidToReverse(leftClimber);
+        setSolenoidToReverse(rightClimber);
+        setSolenoidToReverse(noteAimer);
     }
     
     public void setAllSolenoidsToForward() {
-        leftClimber.set(Value.kForward);
-        rightClimber.set(Value.kForward);
-        noteAimer.set(Value.kForward);
+        setSolenoidToForward(leftClimber);
+        setSolenoidToForward(rightClimber);
+        setSolenoidToForward(noteAimer);
     }
     
     public void turnAllSolenoidsOff() {
-        leftClimber.set(Value.kOff);
-        rightClimber.set(Value.kOff);
-        noteAimer.set(Value.kOff);
+        turnSolenoidOff(leftClimber);
+        turnSolenoidOff(rightClimber);
+        turnSolenoidOff(noteAimer);
         allSolenoidsDisabled = true;
     }
     
