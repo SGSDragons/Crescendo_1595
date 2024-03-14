@@ -8,6 +8,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.utilities.Constants;
 
 import frc.lib.utilities.LimelightTarget;
@@ -34,6 +35,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.utilities.Constants.OperatorConstants;
 import frc.robot.commands.Index;
 import frc.robot.commands.TeleopDrive;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RobotContainer {
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
@@ -121,12 +125,10 @@ public class RobotContainer {
       //No Other Keybinds will Load in System Identification Mode, for no other keybinds will be assigned to actions.
       return;
     }
-    
 
     //Keybinds for... actually driving the robot in TeleOP.
     zeroGyro.onTrue(new InstantCommand(() -> drivetrainSubsystem.zeroHeading()));
 
-    
     //Launches Notes (Automatic launches after spinup, Manual only launches after spinup and button release)
     launchLowAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.LOW, true));
     launchLowManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.LOW, false));
@@ -152,25 +154,20 @@ public class RobotContainer {
     NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
 
     boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
-    if (isBlue) {
-      // Set targeting parameters for blue
-      LimelightTarget target0 = new LimelightTarget(
-          7,
-          sgs.getEntry("aim_0_tx").getDouble(0.0),
-          sgs.getEntry("aim_0_ty").getDouble(0.0),
-          sgs.getEntry("aim_0_heading").getDouble(-140.0),
-          sgs.getEntry("aim_0_tolerance").getDouble(0.0));
-      LimelightTarget target1 = new LimelightTarget(
-          7,
-          sgs.getEntry("aim_1_tx").getDouble(0.0),
-          sgs.getEntry("aim_1_ty").getDouble(0.0),
-          sgs.getEntry("aim_1_heading").getDouble(-160.0),
-          sgs.getEntry("aim_1_tolerance").getDouble(0.0));
+    List<LimelightTarget> targets = isBlue ? blueTargets() : redTargets();
 
-      NamedCommands.registerCommand("Aim-0", new Aim(target0, drivetrainSubsystem));
-      NamedCommands.registerCommand("Aim-1", new Aim(target1, drivetrainSubsystem));
-    } else {
-      // Set targeting parameters for red
+    CommandScheduler.getInstance().schedule(new Command() {
+      @Override
+      public void execute() {
+        // If there's a valid target, report metrics on it (visible, error, etc)
+        int focus = (int)sgs.getEntry("target").getInteger(0);
+        if (focus < targets.size()) {
+          targets.get(focus).find(drivetrainSubsystem.getHeading().getDegrees());
+        }
+      }
+    });
+    for (int i=0; i < targets.size(); ++i) {
+      NamedCommands.registerCommand("Aim-"+i, new Aim(targets.get(i), drivetrainSubsystem));
     }
   }
 
@@ -181,5 +178,32 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return AutoBuilder.followPath(PathPlannerPath.fromPathFile("Auto"));
+  }
+
+  public List<LimelightTarget> blueTargets() {
+    NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
+    List<LimelightTarget> targets = new ArrayList<>();
+
+    targets.add(new LimelightTarget(
+        7,
+        sgs.getEntry("aim_0_tx").getDouble(0.0),
+        sgs.getEntry("aim_0_ty").getDouble(0.0),
+        sgs.getEntry("aim_0_heading").getDouble(-140.0),
+        sgs.getEntry("aim_0_tolerance").getDouble(0.0)));
+    targets.add(new LimelightTarget(
+        7,
+        sgs.getEntry("aim_1_tx").getDouble(0.0),
+        sgs.getEntry("aim_1_ty").getDouble(0.0),
+        sgs.getEntry("aim_1_heading").getDouble(-160.0),
+        sgs.getEntry("aim_1_tolerance").getDouble(0.0)));
+
+    return targets;
+  }
+
+  public List<LimelightTarget> redTargets() {
+    NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
+    List<LimelightTarget> targets = new ArrayList<>();
+
+    return targets;
   }
 }
