@@ -2,13 +2,16 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utilities.Constants.HardwareID;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.Launch.LaunchDirection;
 
 public class LauncherSubsystem extends SubsystemBase{
 
@@ -20,6 +23,8 @@ public class LauncherSubsystem extends SubsystemBase{
     VelocityVoltage topVelocity;
     VelocityVoltage middleVelocity;
     VelocityVoltage bottomVelocity;
+
+    public BooleanSupplier isLauncherSpinning = () -> false;
 
     public LauncherSubsystem() {
         bottomSpinner = new TalonFX(HardwareID.bottomSpinnerMotorCANId);
@@ -36,7 +41,7 @@ public class LauncherSubsystem extends SubsystemBase{
         bottomVelocity = new VelocityVoltage(0);
     }
 
-    public void spinUpperSpinners() {
+    public void spinUpperSpinners(boolean ampShot) {
         
         //Re-apply config for tuning.  SHOULD REMOVE BEFORE COMP
         var config = new Slot0Configs();
@@ -45,7 +50,12 @@ public class LauncherSubsystem extends SubsystemBase{
         config.kI = SmartDashboard.getNumber("i", 0.001);
         config.kD = SmartDashboard.getNumber("d", 0);
         
-        upperTargetV = SmartDashboard.getNumber("upperTargetV", 50);
+        if (ampShot) {
+            upperTargetV = SmartDashboard.getNumber("upperAmpV", 40);
+        }
+        else {
+            upperTargetV = SmartDashboard.getNumber("upperSpeakerV", 80);
+        }
 
         topSpinner.getConfigurator().apply(config);
         middleSpinner.getConfigurator().apply(config);
@@ -63,7 +73,7 @@ public class LauncherSubsystem extends SubsystemBase{
         config.kI = SmartDashboard.getNumber("i", .001);
         config.kD = SmartDashboard.getNumber("d", 0);
 
-        lowerTargetV = SmartDashboard.getNumber("lowerTargetV", -50);
+        lowerTargetV = SmartDashboard.getNumber("lowerSpeakerV", -80);
 
         middleSpinner.getConfigurator().apply(config);
         bottomSpinner.getConfigurator().apply(config);
@@ -72,25 +82,40 @@ public class LauncherSubsystem extends SubsystemBase{
         bottomSpinner.setControl(bottomVelocity.withVelocity(lowerTargetV));
     }
 
-    // public void spinLowerSpinners(double speed) {
-    //     bottomSpinner.set(speed);
-    //     middleSpinner.set(speed);
-    // }
-
-    // public void spinUpperSpinners() {
-    //     middleSpinner.set(-0.3);
-    //     topSpinner.set(-0.3);
-    // }
-
-    // public void spinUpperSpinners(double speed) {
-    // middleSpinner.set(-speed);
-    // topSpinner.set(-speed);
-    // }
-
     public void stopSpinners() {
         bottomSpinner.set(0.0);
         middleSpinner.set(0.0);
         topSpinner.set(0.0);
+    }
+
+    public boolean isLauncherUpToSpeed(LaunchDirection direction) {
+        double lowerMaxVelocity;
+        double upperMaxVelocity;
+
+        if (direction == LaunchDirection.AMP) {
+            lowerMaxVelocity = -SmartDashboard.getNumber("upperAmpV", 80);
+            upperMaxVelocity = SmartDashboard.getNumber("upperAmpV", 80);
+        }
+        else {
+            lowerMaxVelocity = SmartDashboard.getNumber("lowerSpeakerV", -80);
+            upperMaxVelocity = SmartDashboard.getNumber("upperSpeakerV", 80);
+        }
+
+        double bottomSpinnerVelocity = bottomSpinner.getVelocity().getValueAsDouble();
+        double topSpinnerVelocity = topSpinner.getVelocity().getValueAsDouble();
+        double middleSpinnerVelocity = middleSpinner.getVelocity().getValueAsDouble();
+
+        double tolerance = 5;
+
+        /* */
+        if ((bottomSpinnerVelocity < lowerMaxVelocity + tolerance) || (topSpinnerVelocity > upperMaxVelocity - tolerance)) {
+          if ((middleSpinnerVelocity < lowerMaxVelocity + tolerance) || (middleSpinnerVelocity > upperMaxVelocity - tolerance)) {
+            return true;
+          }
+        }
+ 
+        return false;
+ 
     }
 
     @Override

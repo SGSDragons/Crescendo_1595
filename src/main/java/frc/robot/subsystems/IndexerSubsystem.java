@@ -13,7 +13,7 @@ import com.revrobotics.ColorSensorV3;
 
 public class IndexerSubsystem extends SubsystemBase{
 
-    TalonFX indexerMotor, indexerMotorTwo;
+    TalonFX indexerMotor, intakeMotor;
     ColorSensorV3 colorSensor;
     Color percievedColor;
     //DigitalInput beamBreakSensor = new DigitalInput(0); //True when Unimposed
@@ -21,8 +21,8 @@ public class IndexerSubsystem extends SubsystemBase{
 
     public IndexerSubsystem() {
         indexerMotor = new TalonFX(HardwareID.indexerMotorCANId);
-        indexerMotorTwo = new TalonFX(HardwareID.indexerMotor2CANId);
-        indexerMotorTwo.setControl(new Follower(HardwareID.indexerMotorCANId, true));
+        intakeMotor = new TalonFX(HardwareID.indexerMotor2CANId);
+        intakeMotor.setControl(new Follower(HardwareID.indexerMotorCANId, true));
         
         indexerMotor.setNeutralMode(NeutralModeValue.Brake);
         indexerMotor.setInverted(true);
@@ -37,7 +37,7 @@ public class IndexerSubsystem extends SubsystemBase{
 
     public void indexNoteIntake() {
         if (!noteLoaded) {
-            indexerMotor.setVoltage(SmartDashboard.getNumber("indexerIntakeVoltage", 3.00));
+            indexerMotor.setVoltage(SmartDashboard.getNumber("intakeVolt", 3.00));
             return;
         }
 
@@ -45,16 +45,20 @@ public class IndexerSubsystem extends SubsystemBase{
     }
 
     public void indexNoteOuttake() {
-        indexerMotor.setVoltage(SmartDashboard.getNumber("indexerOuttakeVoltage", 3.00));
+        indexerMotor.setVoltage(-SmartDashboard.getNumber("intakeVolt", 3.00));
     }
 
-    public void indexNoteLaunch() {
-        indexerMotor.set(SmartDashboard.getNumber("indexerVoltage", 3.00));
+    public void indexNoteLaunchSpeaker() {
+        indexerMotor.setVoltage(SmartDashboard.getNumber("indexVolt", 6.00));
+    }
+
+    public void indexNoteLaunchSpeaker(double multiplier) {
+        indexerMotor.setVoltage(SmartDashboard.getNumber("indexVolt", 6.00) * multiplier);
     }
 
     //Used for Testing Purposes
     public void indexNoteIntakeDisregardLoading() {
-        indexerMotor.setVoltage(SmartDashboard.getNumber("indexerIntakeVoltage", 3.00));
+        indexerMotor.setVoltage(SmartDashboard.getNumber("intakeVolt", 3.00));
     }
     
     @Override
@@ -85,9 +89,8 @@ public class IndexerSubsystem extends SubsystemBase{
 
     public void telemetry() {
         SmartDashboard.putNumber("Indexer Motor Velocity", indexerMotor.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Intake Motor Velocity", intakeMotor.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Note Proximity", colorSensor.getProximity());
         SmartDashboard.putBoolean("Note Loaded", noteLoaded);
-        SmartDashboard.getNumber("indexerVoltage", 3.00);
-        SmartDashboard.getNumber("indexerOuttakeVoltage", 3.00);
     }
 }

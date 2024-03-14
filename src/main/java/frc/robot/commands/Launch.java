@@ -8,25 +8,27 @@ import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class Launch extends Command {
 
   public enum LaunchDirection {
     LOW,
     HIGH,
-    DROP //If Amp Requires it
+    AMP //If Amp Requires it
   }
 
   private final LauncherSubsystem launcherSubsystem;
+  private final IndexerSubsystem indexerSubsystem;
   private final LaunchDirection direction;
+  private final boolean automatic;
 
-  public Launch(LauncherSubsystem launcherSubsystem, LaunchDirection direction) {
+  public Launch(LauncherSubsystem launcherSubsystem, IndexerSubsystem indexerSubsystem, LaunchDirection direction, boolean automatic) {
     this.launcherSubsystem = launcherSubsystem;
+    this.indexerSubsystem = indexerSubsystem;
     addRequirements(launcherSubsystem);
 
     this.direction = direction;
+    this.automatic = automatic;
   }
 
   // Called when the command is initially scheduled.
@@ -42,23 +44,34 @@ public class Launch extends Command {
         launcherSubsystem.spinLowerSpinners();
         break;
       case HIGH:
-        launcherSubsystem.spinUpperSpinners();
+        launcherSubsystem.spinUpperSpinners(false);
         break;
-      case DROP:
-        // launcherSubsystem.spinUpperSpinners(0.1);
+      case AMP:
+        launcherSubsystem.spinUpperSpinners(true);
         break;
       default: break;
     }
     
-    //indexerSubsystem.indexNoteLaunch();
+    if (launcherSubsystem.isLauncherUpToSpeed(direction) && automatic) {
+      if (direction == LaunchDirection.AMP) {
+        indexerSubsystem.indexNoteLaunchSpeaker(0.005);
+      }
+
+      indexerSubsystem.indexNoteLaunchSpeaker();
+    }
 
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+
+    if (!automatic) {
+      return;
+    }
+
     launcherSubsystem.stopSpinners();
-    //indexerSubsystem.stopIndexer();
+    indexerSubsystem.stopIndexer();
   }
 
   // Returns true when the command should end.
