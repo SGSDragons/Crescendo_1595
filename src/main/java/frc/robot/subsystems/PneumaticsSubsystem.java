@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -10,18 +11,18 @@ import frc.lib.utilities.Constants.HardwareID;
 
 public class PneumaticsSubsystem extends SubsystemBase{
 
-    public DoubleSolenoid leftClimber, rightClimber, noteAimer;
+    public DoubleSolenoid leftClimber, rightClimber, noteAimerLeft, noteAimerRight;
     boolean allSolenoidsDisabled = false;
     Compressor compressor;
 
 
     public PneumaticsSubsystem() {
-        leftClimber = new DoubleSolenoid(PneumaticsModuleType.REVPH, HardwareID.leftClimberForwardChannel, HardwareID.leftClimberReverseChannel);
-        rightClimber = new DoubleSolenoid(PneumaticsModuleType.REVPH, HardwareID.rightClimberForwardChannel, HardwareID.rightClimberReverseChannel);
-        noteAimer = new DoubleSolenoid(PneumaticsModuleType.REVPH, HardwareID.noteAimerForwardChannel, HardwareID.noteAimerReverseChannel);
+        leftClimber = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, HardwareID.leftClimberForwardChannel, HardwareID.leftClimberReverseChannel);
+        rightClimber = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, HardwareID.rightClimberForwardChannel, HardwareID.rightClimberReverseChannel);
+        noteAimerLeft = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, HardwareID.leftNoteAimerForwardChannel, HardwareID.leftNoteAimerReverseChannel);
+        noteAimerRight = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, HardwareID.rightNoteAimerForwardChannel, HardwareID.rightNoteAimerReverseChannel);
 
-
-        compressor = new Compressor(PneumaticsModuleType.REVPH);
+        compressor = new Compressor(1, PneumaticsModuleType.REVPH);
         compressor.enableDigital();
 
         setAllSolenoidsToReverse();
@@ -49,26 +50,30 @@ public class PneumaticsSubsystem extends SubsystemBase{
     public void setAllSolenoidsToReverse() {
         setSolenoidToReverse(leftClimber);
         setSolenoidToReverse(rightClimber);
-        setSolenoidToReverse(noteAimer);
+        setSolenoidToReverse(noteAimerLeft);
+        setSolenoidToReverse(noteAimerRight);
     }
     
     public void setAllSolenoidsToForward() {
         setSolenoidToForward(leftClimber);
         setSolenoidToForward(rightClimber);
-        setSolenoidToForward(noteAimer);
+        setSolenoidToForward(noteAimerLeft);
+        setSolenoidToForward(noteAimerRight);
     }
     
     public void turnAllSolenoidsOff() {
         turnSolenoidOff(leftClimber);
         turnSolenoidOff(rightClimber);
-        turnSolenoidOff(noteAimer);
+        turnSolenoidOff(noteAimerLeft);
+        turnSolenoidOff(noteAimerRight);
         allSolenoidsDisabled = true;
     }
     
     public void toggleAllSolenoids() {
         leftClimber.toggle();
         rightClimber.toggle();
-        noteAimer.toggle();
+        noteAimerLeft.toggle();
+        noteAimerRight.toggle();
     }
     
     //Not reccommended to use unless necessary, compressor should always be enabled if one intends to use pneumatics.
@@ -81,14 +86,14 @@ public class PneumaticsSubsystem extends SubsystemBase{
     }
     
     public boolean isForwardShorted() {
-        if (leftClimber.isFwdSolenoidDisabled() || rightClimber.isFwdSolenoidDisabled() || noteAimer.isFwdSolenoidDisabled()) {
+        if (leftClimber.isFwdSolenoidDisabled() || rightClimber.isFwdSolenoidDisabled() || noteAimerLeft.isFwdSolenoidDisabled() || noteAimerRight.isFwdSolenoidDisabled()) {
             return true;
         }
         return false;
     }
     
     public boolean isReverseShorted() {
-        if (leftClimber.isRevSolenoidDisabled() || rightClimber.isRevSolenoidDisabled() || noteAimer.isRevSolenoidDisabled()) {
+        if (leftClimber.isRevSolenoidDisabled() || rightClimber.isRevSolenoidDisabled() || noteAimerLeft.isRevSolenoidDisabled() || noteAimerRight.isRevSolenoidDisabled()) {
             return true;
         }
         return false;
@@ -101,11 +106,14 @@ public class PneumaticsSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         //Turns pneumatics off if an electical short occurs in either the forward or reverse solenoids.
+        /* 
         if (isForwardShorted() || isReverseShorted()) {
             turnAllSolenoidsOff();
             compressor.disable();
         }
         
-        telemetry();
+         */
+        
+        //telemetry();
     }
 }

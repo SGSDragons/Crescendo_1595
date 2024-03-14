@@ -14,8 +14,8 @@ import com.revrobotics.ColorSensorV3;
 public class IndexerSubsystem extends SubsystemBase{
 
     TalonFX indexerMotor, intakeMotor;
-    ColorSensorV3 colorSensor;
-    Color percievedColor;
+    //ColorSensorV3 colorSensor;
+    //Color percievedColor;
     //DigitalInput beamBreakSensor = new DigitalInput(0); //True when Unimposed
     boolean noteLoaded = false;
 
@@ -27,7 +27,7 @@ public class IndexerSubsystem extends SubsystemBase{
         indexerMotor.setNeutralMode(NeutralModeValue.Brake);
         indexerMotor.setInverted(true);
         
-        colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+        //colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
         noteLoaded = false;
     }
 
@@ -72,14 +72,14 @@ public class IndexerSubsystem extends SubsystemBase{
             noteLoaded = false;
         }
         */
-        
+        /* 
         int proximity = colorSensor.getProximity();
         if (proximity > 250) {
             noteLoaded = true;
         }
         else {
             noteLoaded = false;
-        }
+        }*/
         telemetry();
     }
 
@@ -90,7 +90,7 @@ public class IndexerSubsystem extends SubsystemBase{
     public void telemetry() {
         SmartDashboard.putNumber("Indexer Motor Velocity", indexerMotor.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Intake Motor Velocity", intakeMotor.getVelocity().getValueAsDouble());
-        SmartDashboard.putNumber("Note Proximity", colorSensor.getProximity());
+        //SmartDashboard.putNumber("Note Proximity", colorSensor.getProximity());
         SmartDashboard.putBoolean("Note Loaded", noteLoaded);
     }
 }

@@ -66,12 +66,14 @@ public final class Constants {
 
   //Hardware IDs for parts on robot (excluding drivetrain).
   public static final class HardwareID {
-    public static final int leftClimberForwardChannel = 0;
-    public static final int leftClimberReverseChannel = 1;
-    public static final int rightClimberForwardChannel = 2;
-    public static final int rightClimberReverseChannel = 3;
-    public static final int noteAimerForwardChannel = 4;
-    public static final int noteAimerReverseChannel = 5;
+    public static final int leftClimberForwardChannel = 1;
+    public static final int leftClimberReverseChannel = 2;
+    public static final int rightClimberForwardChannel = 3;
+    public static final int rightClimberReverseChannel = 4;
+    public static final int leftNoteAimerForwardChannel = 5;
+    public static final int leftNoteAimerReverseChannel = 6;
+    public static final int rightNoteAimerForwardChannel = 7;
+    public static final int rightNoteAimerReverseChannel = 8;
 
     public static final int indexerMotorCANId = 18;
     public static final int indexerMotor2CANId = 15;

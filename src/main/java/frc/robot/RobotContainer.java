@@ -19,6 +19,7 @@ import frc.robot.commands.Launch;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.subsystems.PneumaticsSubsystem;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -39,6 +40,7 @@ public class RobotContainer {
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   private final LauncherSubsystem launcherSubsystem = new LauncherSubsystem();
+  private final PneumaticsSubsystem pneumaticsSubsystem = new PneumaticsSubsystem();
 
   private final Joystick driver = new Joystick(OperatorConstants.driverControllerPort);
   private final Joystick operator = new Joystick(OperatorConstants.operatorControllerPort);
@@ -60,6 +62,9 @@ public class RobotContainer {
 
   private final JoystickButton indexerIntake = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
   private final JoystickButton indexerOuttake = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
+
+  private final JoystickButton climber = new JoystickButton(operator, XboxController.Button.kLeftStick.value);
+  private final JoystickButton launcher = new JoystickButton(operator, XboxController.Button.kRightStick.value);
 
   private final SendableChooser<Command> autoChooser;
 
@@ -144,6 +149,23 @@ public class RobotContainer {
     indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_RECKLESS)); //Reckless
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
 
+    climber.whileTrue(new InstantCommand(() -> {
+      pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.leftClimber);
+      pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.rightClimber);
+    }));
+    climber.whileFalse(new InstantCommand(() -> {
+      pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.leftClimber);
+      pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.rightClimber);
+    }));
+
+    launcher.whileTrue(new InstantCommand(() -> {
+      pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerLeft);
+      pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerRight);
+    }));
+    launcher.whileFalse(new InstantCommand(() -> {
+      pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.noteAimerLeft);
+      pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.noteAimerRight);
+    }));
   }
 
   private void registerNamedCommands() {
