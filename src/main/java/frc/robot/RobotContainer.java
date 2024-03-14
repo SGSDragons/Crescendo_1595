@@ -4,10 +4,14 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.path.PathPlannerPath;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.lib.utilities.Constants;
-import frc.lib.utilities.Constants.*;
 
-import frc.robot.commands.TeleopDrive;
+import frc.lib.utilities.LimelightTarget;
+import frc.robot.commands.*;
 import frc.robot.commands.Index.IndexDirection;
 import frc.robot.commands.Launch.LaunchDirection;
 import frc.robot.commands.Index;
@@ -27,6 +31,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.lib.utilities.Constants.OperatorConstants;
+import frc.robot.commands.Index;
+import frc.robot.commands.TeleopDrive;
 
 public class RobotContainer {
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
@@ -141,6 +148,30 @@ public class RobotContainer {
 
   private void registerNamedCommands() {
     NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.LOW, true).withTimeout(2.5));
+
+    NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
+
+    boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
+    if (isBlue) {
+      // Set targeting parameters for blue
+      LimelightTarget target0 = new LimelightTarget(
+          7,
+          sgs.getEntry("aim_0_tx").getDouble(0.0),
+          sgs.getEntry("aim_0_ty").getDouble(0.0),
+          sgs.getEntry("aim_0_heading").getDouble(-140.0),
+          sgs.getEntry("aim_0_tolerance").getDouble(0.0));
+      LimelightTarget target1 = new LimelightTarget(
+          7,
+          sgs.getEntry("aim_1_tx").getDouble(0.0),
+          sgs.getEntry("aim_1_ty").getDouble(0.0),
+          sgs.getEntry("aim_1_heading").getDouble(-160.0),
+          sgs.getEntry("aim_1_tolerance").getDouble(0.0));
+
+      NamedCommands.registerCommand("Aim-0", new Aim(target0, drivetrainSubsystem));
+      NamedCommands.registerCommand("Aim-1", new Aim(target1, drivetrainSubsystem));
+    } else {
+      // Set targeting parameters for red
+    }
   }
 
   /**
@@ -148,9 +179,7 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-
-  
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return AutoBuilder.followPath(PathPlannerPath.fromPathFile("Auto"));
   }
 }
