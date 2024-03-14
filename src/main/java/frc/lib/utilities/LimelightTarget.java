@@ -1,7 +1,6 @@
 package frc.lib.utilities;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -27,11 +26,11 @@ public class LimelightTarget {
 
     public final double lateralTolerance;
 
-    private NetworkTableEntry errorX;
-    private NetworkTableEntry errorY;
-    private NetworkTableEntry errorHeading;
-    private NetworkTableEntry tagVisible;
-    private NetworkTableEntry locked;
+    private final NetworkTableEntry errorX;
+    private final NetworkTableEntry errorY;
+    private final NetworkTableEntry errorHeading;
+    private final NetworkTableEntry tagVisible;
+    private final NetworkTableEntry locked;
 
     public LimelightTarget(int tagId, double wantedX, double wantedY, double wantedHeading, double lateralTolerance) {
         this.tagId = tagId;
@@ -64,6 +63,7 @@ public class LimelightTarget {
                 errorY.setDouble(error.y);
                 errorHeading.setDouble(error.heading);
                 tagVisible.setBoolean(true);
+                locked.setBoolean(error.x == 0 && error.y == 0 && error.heading == 0);
                 return error;
             }
         }
