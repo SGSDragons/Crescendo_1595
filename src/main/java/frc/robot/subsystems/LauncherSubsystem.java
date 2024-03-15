@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utilities.Constants.HardwareID;
+import frc.lib.utilities.Constants.TuningValues;
 import frc.robot.commands.Launch.LaunchDirection;
 
 public class LauncherSubsystem extends SubsystemBase{
@@ -43,12 +44,11 @@ public class LauncherSubsystem extends SubsystemBase{
 
     public void spinUpperSpinners(boolean ampShot) {
         
-        //Re-apply config for tuning.  SHOULD REMOVE BEFORE COMP
         var config = new Slot0Configs();
-        config.kV = SmartDashboard.getNumber("V", 0.14);
-        config.kP = SmartDashboard.getNumber("p", 8.0);
-        config.kI = SmartDashboard.getNumber("i", 0.001);
-        config.kD = SmartDashboard.getNumber("d", 0);
+        config.kV = TuningValues.launcherkV;
+        config.kP = TuningValues.launcherkP;
+        config.kI = TuningValues.launcherkI;
+        config.kD = TuningValues.launcherkD;
         
         if (ampShot) {
             upperTargetV = SmartDashboard.getNumber("upperAmpV", 40);
@@ -66,12 +66,11 @@ public class LauncherSubsystem extends SubsystemBase{
 
     public void spinLowerSpinners() {
         
-        //Re-apply config for tuning.  SHOULD REMOVE BEFORE COMP
         var config = new Slot0Configs();
-        config.kV = SmartDashboard.getNumber("V", .14);
-        config.kP = SmartDashboard.getNumber("p", 8.0);
-        config.kI = SmartDashboard.getNumber("i", .001);
-        config.kD = SmartDashboard.getNumber("d", 0);
+        config.kV = TuningValues.launcherkV;
+        config.kP = TuningValues.launcherkP;
+        config.kI = TuningValues.launcherkI;
+        config.kD = TuningValues.launcherkD;
 
         lowerTargetV = SmartDashboard.getNumber("lowerSpeakerV", -80);
 
@@ -85,7 +84,13 @@ public class LauncherSubsystem extends SubsystemBase{
     public void stopSpinners() {
         bottomSpinner.set(0.0);
         middleSpinner.set(0.0);
+        topSpinner.set(0.0);                     
+
+        /*
+        bottomSpinner.set(0.0);
+        middleSpinner.set(0.0);
         topSpinner.set(0.0);
+        */
     }
 
     public boolean isLauncherUpToSpeed(LaunchDirection direction) {
@@ -93,8 +98,8 @@ public class LauncherSubsystem extends SubsystemBase{
         double upperMaxVelocity;
 
         if (direction == LaunchDirection.AMP) {
-            lowerMaxVelocity = -SmartDashboard.getNumber("upperAmpV", 80);
-            upperMaxVelocity = SmartDashboard.getNumber("upperAmpV", 80);
+            lowerMaxVelocity = -SmartDashboard.getNumber("upperAmpV", 40);
+            upperMaxVelocity = SmartDashboard.getNumber("upperAmpV", 40);
         }
         else {
             lowerMaxVelocity = SmartDashboard.getNumber("lowerSpeakerV", -80);
@@ -105,9 +110,8 @@ public class LauncherSubsystem extends SubsystemBase{
         double topSpinnerVelocity = topSpinner.getVelocity().getValueAsDouble();
         double middleSpinnerVelocity = middleSpinner.getVelocity().getValueAsDouble();
 
-        double tolerance = 5;
+        double tolerance = 15;
 
-        /* */
         if ((bottomSpinnerVelocity < lowerMaxVelocity + tolerance) || (topSpinnerVelocity > upperMaxVelocity - tolerance)) {
           if ((middleSpinnerVelocity < lowerMaxVelocity + tolerance) || (middleSpinnerVelocity > upperMaxVelocity - tolerance)) {
             return true;

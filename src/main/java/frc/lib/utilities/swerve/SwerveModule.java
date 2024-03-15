@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Robot;
-import frc.lib.utilities.Conversions;
 import frc.lib.utilities.Constants.SwerveConstants;
 
 public class SwerveModule {

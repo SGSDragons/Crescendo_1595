@@ -13,7 +13,7 @@ public class Index extends Command {
   public enum IndexDirection {
     INTAKE,
     OUTTAKE,
-    INTAKE_RECKLESS //Intakes without stopping when note is loaded.
+    INTAKE_DISREGARD_LOADING // Intakes without stopping when note is loaded.
   }
 
   private final IndexerSubsystem indexerSubsystem;
@@ -41,7 +41,7 @@ public class Index extends Command {
       case OUTTAKE:
         indexerSubsystem.indexNoteOuttake();
         break;
-      case INTAKE_RECKLESS:
+      case INTAKE_DISREGARD_LOADING:
         indexerSubsystem.indexNoteIntakeDisregardLoading();
         break;
       default: break;

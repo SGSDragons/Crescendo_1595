@@ -66,14 +66,14 @@ public final class Constants {
 
   //Hardware IDs for parts on robot (excluding drivetrain).
   public static final class HardwareID {
-    public static final int leftClimberForwardChannel = 1;
-    public static final int leftClimberReverseChannel = 2;
-    public static final int rightClimberForwardChannel = 3;
-    public static final int rightClimberReverseChannel = 4;
-    public static final int leftNoteAimerForwardChannel = 5;
-    public static final int leftNoteAimerReverseChannel = 6;
-    public static final int rightNoteAimerForwardChannel = 7;
-    public static final int rightNoteAimerReverseChannel = 8;
+    public static final int leftClimberForwardChannel = 4;
+    public static final int leftClimberReverseChannel = 5;
+    public static final int rightClimberForwardChannel = 6;
+    public static final int rightClimberReverseChannel = 7;
+    public static final int leftNoteAimerForwardChannel = 0;
+    public static final int leftNoteAimerReverseChannel = 1;
+    public static final int rightNoteAimerForwardChannel = 2;
+    public static final int rightNoteAimerReverseChannel = 3;
 
     public static final int indexerMotorCANId = 18;
     public static final int indexerMotor2CANId = 15;
@@ -82,8 +82,16 @@ public final class Constants {
     public static final int topSpinnerMotorCANId = 16;
   }
 
+  public static final class TuningValues {
+    public static final double launcherkV = 0.14;
+    public static final double launcherkP = 8.0;
+    public static final double launcherkI = 0.001;
+    public static final double launcherkD = 0.0;
+  }
+
   public static final class SystemToggles {
     public static final boolean systemIdentification = false;
+    public static final boolean useAustinsWackyAhController = false; //Turn to true when it works idk
   }
   
   public static final class SwerveConstants {

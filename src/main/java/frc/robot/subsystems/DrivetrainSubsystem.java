@@ -28,17 +28,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.lib.utilities.Conversions;
 import frc.lib.utilities.Constants.AutoConstants;
 import frc.lib.utilities.Constants.SwerveConstants;
 import frc.lib.utilities.swerve.COTSTalonFXSwerveConstants.SDS.MK4;
+import frc.lib.utilities.swerve.Conversions;
 import frc.lib.utilities.swerve.SwerveModule;
 
 public class DrivetrainSubsystem extends SubsystemBase {
   public SwerveDriveOdometry swerveDriveOdometry;
   public SwerveModule[] swerveModules;
   public AHRS navx;
-  private double highestMeasuredVelocity = 0;
+  //private double highestMeasuredVelocity = 0;
 
   //System Identification
 
@@ -169,7 +169,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   public Rotation2d getGyroYaw() {
     return Rotation2d.fromDegrees(-navx.getAngle()); //Negated because NavX CW Positive while ChassisSpeeds requires CCW Positive
-    /*return Rotation2d.fromDegrees(360 - navx.getYaw());*/ //Old, non-continous method of obtaining yaw. Above aligns more with behavior of Pigeon 2.
   }
 
   public void resetModulesToAbsolute() {
@@ -183,10 +182,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Module " + module.moduleNumber + " CANcoder", module.getCANcoder().getDegrees());
             SmartDashboard.putNumber("Module " + module.moduleNumber + " Angle", module.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Module " + module.moduleNumber + " Velocity", module.getState().speedMetersPerSecond);
-            if (module.getState().speedMetersPerSecond > highestMeasuredVelocity) {
+            /*if (module.getState().speedMetersPerSecond > highestMeasuredVelocity) {
               highestMeasuredVelocity = module.getState().speedMetersPerSecond;
             }
-            SmartDashboard.putNumber("Module " + module.moduleNumber + "MaximumSpeed", highestMeasuredVelocity);
+            SmartDashboard.putNumber("Module " + module.moduleNumber + "MaximumSpeed", highestMeasuredVelocity);*/
           }     
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
   }
@@ -228,6 +227,5 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
   }
 }

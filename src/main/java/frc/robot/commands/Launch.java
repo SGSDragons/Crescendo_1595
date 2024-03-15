@@ -6,7 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
-
+import frc.robot.subsystems.PneumaticsSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class Launch extends Command {
@@ -19,10 +19,12 @@ public class Launch extends Command {
 
   private final LauncherSubsystem launcherSubsystem;
   private final IndexerSubsystem indexerSubsystem;
+  private final PneumaticsSubsystem pneumaticsSubsystem;
   private final LaunchDirection direction;
   private final boolean automatic;
 
-  public Launch(LauncherSubsystem launcherSubsystem, IndexerSubsystem indexerSubsystem, LaunchDirection direction, boolean automatic) {
+  public Launch(LauncherSubsystem launcherSubsystem, IndexerSubsystem indexerSubsystem, PneumaticsSubsystem pneumaticsSubsystem, LaunchDirection direction, boolean automatic) {
+    this.pneumaticsSubsystem = pneumaticsSubsystem;
     this.launcherSubsystem = launcherSubsystem;
     this.indexerSubsystem = indexerSubsystem;
     addRequirements(launcherSubsystem);
@@ -38,15 +40,18 @@ public class Launch extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
     switch (direction) {
       case LOW:
         launcherSubsystem.spinLowerSpinners();
         break;
       case HIGH:
+        pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerRight);
+        pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerLeft);
         launcherSubsystem.spinUpperSpinners(false);
         break;
       case AMP:
+        pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerRight);
+        pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerLeft);
         launcherSubsystem.spinUpperSpinners(true);
         break;
       default: break;
@@ -54,7 +59,7 @@ public class Launch extends Command {
     
     if (launcherSubsystem.isLauncherUpToSpeed(direction) && automatic) {
       if (direction == LaunchDirection.AMP) {
-        indexerSubsystem.indexNoteLaunchSpeaker(0.005);
+        indexerSubsystem.indexNoteLaunchSpeaker(0.5);
       }
 
       indexerSubsystem.indexNoteLaunchSpeaker();
@@ -72,6 +77,8 @@ public class Launch extends Command {
 
     launcherSubsystem.stopSpinners();
     indexerSubsystem.stopIndexer();
+    pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.noteAimerRight);
+    pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.noteAimerLeft);
   }
 
   // Returns true when the command should end.

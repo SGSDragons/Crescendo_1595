@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,12 +16,12 @@ public class PneumaticsSubsystem extends SubsystemBase{
 
 
     public PneumaticsSubsystem() {
-        leftClimber = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, HardwareID.leftClimberForwardChannel, HardwareID.leftClimberReverseChannel);
-        rightClimber = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, HardwareID.rightClimberForwardChannel, HardwareID.rightClimberReverseChannel);
-        noteAimerLeft = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, HardwareID.leftNoteAimerForwardChannel, HardwareID.leftNoteAimerReverseChannel);
-        noteAimerRight = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, HardwareID.rightNoteAimerForwardChannel, HardwareID.rightNoteAimerReverseChannel);
+        leftClimber = new DoubleSolenoid(2, PneumaticsModuleType.REVPH, HardwareID.leftClimberForwardChannel, HardwareID.leftClimberReverseChannel);
+        rightClimber = new DoubleSolenoid(2, PneumaticsModuleType.REVPH, HardwareID.rightClimberForwardChannel, HardwareID.rightClimberReverseChannel);
+        noteAimerLeft = new DoubleSolenoid(2, PneumaticsModuleType.REVPH, HardwareID.leftNoteAimerForwardChannel, HardwareID.leftNoteAimerReverseChannel);
+        noteAimerRight = new DoubleSolenoid(2, PneumaticsModuleType.REVPH, HardwareID.rightNoteAimerForwardChannel, HardwareID.rightNoteAimerReverseChannel);
 
-        compressor = new Compressor(1, PneumaticsModuleType.REVPH);
+        compressor = new Compressor(2, PneumaticsModuleType.REVPH);
         compressor.enableDigital();
 
         setAllSolenoidsToReverse();
@@ -76,6 +75,14 @@ public class PneumaticsSubsystem extends SubsystemBase{
         noteAimerRight.toggle();
     }
     
+    public void enableCompressor() {
+        compressor.enableDigital();
+    }
+
+    public void disableCompressor() {
+        compressor.disable();
+    }
+
     //Not reccommended to use unless necessary, compressor should always be enabled if one intends to use pneumatics.
     public void toggleCompressor() {
         if (compressor.isEnabled()) {
@@ -100,7 +107,7 @@ public class PneumaticsSubsystem extends SubsystemBase{
     }
     
     private void telemetry() {
-        SmartDashboard.putBoolean("All Solenoids Disabled", allSolenoidsDisabled);
+        SmartDashboard.putBoolean("Compressor Enabled", compressor.isEnabled());
     }
     
     @Override
@@ -113,7 +120,6 @@ public class PneumaticsSubsystem extends SubsystemBase{
         }
         
          */
-        
-        //telemetry();
+        telemetry();
     }
 }

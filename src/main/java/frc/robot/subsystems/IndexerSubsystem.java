@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utilities.Constants.HardwareID;
 
@@ -14,9 +13,7 @@ import com.revrobotics.ColorSensorV3;
 public class IndexerSubsystem extends SubsystemBase{
 
     TalonFX indexerMotor, intakeMotor;
-    //ColorSensorV3 colorSensor;
-    //Color percievedColor;
-    //DigitalInput beamBreakSensor = new DigitalInput(0); //True when Unimposed
+    ColorSensorV3 colorSensorLeft, colorSensorRight;
     boolean noteLoaded = false;
 
     public IndexerSubsystem() {
@@ -27,7 +24,8 @@ public class IndexerSubsystem extends SubsystemBase{
         indexerMotor.setNeutralMode(NeutralModeValue.Brake);
         indexerMotor.setInverted(true);
         
-        //colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+        colorSensorLeft = new ColorSensorV3(I2C.Port.kOnboard);
+        colorSensorRight = new ColorSensorV3(I2C.Port.kMXP);
         noteLoaded = false;
     }
 
@@ -63,23 +61,16 @@ public class IndexerSubsystem extends SubsystemBase{
     
     @Override
     public void periodic() {
+         
+        int leftProximity = colorSensorLeft.getProximity();
+        int rightProximity = colorSensorRight.getProximity();
+        if (leftProximity > 250 || rightProximity > 250) {
+            noteLoaded = true;
+        }
+        else {
+            noteLoaded = false;
+        }
 
-        /*
-        if (!beamBreakSensor.get()) {
-            noteLoaded = true;
-        }
-        else {
-            noteLoaded = false;
-        }
-        */
-        /* 
-        int proximity = colorSensor.getProximity();
-        if (proximity > 250) {
-            noteLoaded = true;
-        }
-        else {
-            noteLoaded = false;
-        }*/
         telemetry();
     }
 
@@ -90,7 +81,6 @@ public class IndexerSubsystem extends SubsystemBase{
     public void telemetry() {
         SmartDashboard.putNumber("Indexer Motor Velocity", indexerMotor.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Intake Motor Velocity", intakeMotor.getVelocity().getValueAsDouble());
-        //SmartDashboard.putNumber("Note Proximity", colorSensor.getProximity());
         SmartDashboard.putBoolean("Note Loaded", noteLoaded);
     }
 }

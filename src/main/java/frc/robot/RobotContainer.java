@@ -8,6 +8,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib.utilities.Constants;
 
@@ -31,10 +32,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.utilities.Constants.OperatorConstants;
-import frc.robot.commands.Index;
+import frc.lib.utilities.Constants.SystemToggles;
 import frc.robot.commands.TeleopDrive;
 
 import java.util.ArrayList;
@@ -55,6 +57,10 @@ public class RobotContainer {
 
   private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kStart.value);
   private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+  private final JoystickButton slowAim = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+
+  private final JoystickButton climberUp = new JoystickButton(driver, XboxController.Button.kY.value);
+  private final JoystickButton climberDown = new JoystickButton(driver, XboxController.Button.kA.value);
 
   private final JoystickButton launchAmpAutomatic = new JoystickButton(operator, XboxController.Button.kStart.value);
   private final JoystickButton launchAmpManual = new JoystickButton(operator, XboxController.Button.kBack.value);
@@ -67,15 +73,11 @@ public class RobotContainer {
   private final JoystickButton indexerIntake = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
   private final JoystickButton indexerOuttake = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
 
-  private final JoystickButton climber = new JoystickButton(operator, XboxController.Button.kLeftStick.value);
-  private final JoystickButton launcher = new JoystickButton(operator, XboxController.Button.kRightStick.value);
+
+  
+  private final JoystickButton compressor = new JoystickButton(operator, XboxController.Button.kRightStick.value);
 
   private final SendableChooser<Command> autoChooser;
-
-  private double launcherkV = 0.14;
-  private double launcherkp = 8.0;
-  private double launcherki = 0.001;
-  private double launcherkd = 0.0;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -95,15 +97,9 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-
-    SmartDashboard.putNumber("V", launcherkV);
-    SmartDashboard.putNumber("p", launcherkp);
-    SmartDashboard.putNumber("i", launcherki);
-    SmartDashboard.putNumber("d", launcherkd);
-
     SmartDashboard.putNumber("upperSpeakerV", 80);
     SmartDashboard.putNumber("lowerSpeakerV", -80);
-    SmartDashboard.putNumber("upperAmpV", 20);
+    SmartDashboard.putNumber("upperAmpV", 40);
 
     SmartDashboard.putNumber("indexVolt", 6.0);
     SmartDashboard.putNumber("intakeVolt", 3.0);
@@ -115,7 +111,7 @@ public class RobotContainer {
   private void configureBindings() {
 
     //The keybinds and commands for system identification only load if the mode is enabled in constants (for programming purposes).
-    if (Constants.SystemToggles.systemIdentification) {
+    if (SystemToggles.systemIdentification) {
       JoystickButton driveQuasiForward = new JoystickButton(driver, XboxController.Button.kBack.value);
       JoystickButton driveQuasiBackward = new JoystickButton(driver, XboxController.Button.kStart.value);
       JoystickButton driveDynamicForward = new JoystickButton(driver, XboxController.Button.kX.value);
@@ -134,44 +130,49 @@ public class RobotContainer {
     //Keybinds for... actually driving the robot in TeleOP.
     zeroGyro.onTrue(new InstantCommand(() -> drivetrainSubsystem.zeroHeading()));
 
+    slowAim.whileTrue(new TeleopDrive(
+          drivetrainSubsystem,
+          () -> -driver.getRawAxis(translationAxis),
+          () -> -driver.getRawAxis(strafeAxis),
+          () -> -driver.getRawAxis(rotationAxis) * 0.25,
+          () -> robotCentric.getAsBoolean()
+        ));
+
     //Launches Notes (Automatic launches after spinup, Manual only launches after spinup and button release)
-    launchLowAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.LOW, true));
-    launchLowManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.LOW, false));
-    launchLowManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.LOW, true).withTimeout(0.75));
+    launchLowAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true));
+    launchLowManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, false));
+    launchLowManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(0.75));
     
-    launchHighAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.HIGH, true));
-    launchHighManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.HIGH, false));
-    launchHighManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.HIGH, true).withTimeout(0.75));
+    launchHighAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true));
+    launchHighManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, false));
+    launchHighManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true).withTimeout(0.75));
     
-    launchAmpAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.AMP, true));
-    launchAmpManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.AMP, false));
-    launchAmpManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.AMP, true).withTimeout(1.00));
+    launchAmpAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true));
+    launchAmpManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, false));
+    launchAmpManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.00));
     
 
-    indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_RECKLESS)); //Reckless
+    indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_DISREGARD_LOADING)); //Does not check for if note is loaded
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
 
-    climber.whileTrue(new InstantCommand(() -> {
+   
+    
+    climberUp.onTrue(new InstantCommand(() -> {
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.leftClimber);
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.rightClimber);
     }));
-    climber.whileFalse(new InstantCommand(() -> {
+    climberDown.onTrue(new InstantCommand(() -> {
       pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.leftClimber);
       pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.rightClimber);
     }));
 
-    launcher.whileTrue(new InstantCommand(() -> {
-      pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerLeft);
-      pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerRight);
-    }));
-    launcher.whileFalse(new InstantCommand(() -> {
-      pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.noteAimerLeft);
-      pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.noteAimerRight);
-    }));
+    compressor.onTrue(new InstantCommand(() -> pneumaticsSubsystem.toggleCompressor()));
   }
-
+  
   private void registerNamedCommands() {
-    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, LaunchDirection.LOW, true).withTimeout(2.5));
+    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(2.5));
+    NamedCommands.registerCommand("Intake", new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(0.85)
+      .andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
 
     NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
 
@@ -184,7 +185,7 @@ public class RobotContainer {
         // If there's a valid target, report metrics on it (visible, error, etc)
         int focus = (int)sgs.getEntry("target").getInteger(0);
         if (focus < targets.size()) {
-          targets.get(focus).find(drivetrainSubsystem.getHeading().getDegrees());
+          targets.get(focus).find(drivetrainSubsystem.getHeading().getDegrees()); //Why are we doing this here if the values aren't being saved and its also happening in the Aim command?
         }
       }
     });
@@ -193,13 +194,8 @@ public class RobotContainer {
     }
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
-    return AutoBuilder.followPath(PathPlannerPath.fromPathFile("Auto"));
+    return AutoBuilder.followPath(PathPlannerPath.fromPathFile("Auto")); //Should this change to Auto-Red and Auto-Blue?
   }
 
   public List<LimelightTarget> blueTargets() {
@@ -224,7 +220,7 @@ public class RobotContainer {
 
   public List<LimelightTarget> redTargets() {
     NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
-    List<LimelightTarget> targets = new ArrayList<>();
+    List<LimelightTarget> targets = new ArrayList<>(); //Is it planned for this to have the same targets but with a different tag or something completely different?
 
     return targets;
   }
