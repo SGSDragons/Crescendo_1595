@@ -180,7 +180,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(1.5));
     NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true).withTimeout(1.5));
     NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.5));
-    NamedCommands.registerCommand("Intake", new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(0.85)
+    NamedCommands.registerCommand("Intake",
+      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(1.1)
       .andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
 
     NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
