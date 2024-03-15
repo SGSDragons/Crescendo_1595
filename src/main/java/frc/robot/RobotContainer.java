@@ -214,6 +214,12 @@ public class RobotContainer {
         sgs.getEntry("aim_1_ty").getDouble(0.0),
         sgs.getEntry("aim_1_heading").getDouble(-160.0),
         sgs.getEntry("aim_1_tolerance").getDouble(0.0)));
+    targets.add(new LimelightTarget(
+        7,
+        sgs.getEntry("aim_1_tx").getDouble(0.0),
+        sgs.getEntry("aim_1_ty").getDouble(0.0),
+        sgs.getEntry("aim_1_heading").getDouble(-160.0),
+        sgs.getEntry("aim_1_tolerance").getDouble(0.0)));
 
     return targets;
   }
