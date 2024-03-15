@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -177,7 +178,7 @@ public class RobotContainer {
 
     NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
 
-    boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
+    boolean isBlue = isBlue();
     List<LimelightTarget> targets = isBlue ? blueTargets() : redTargets();
 
     for (int i=0; i < targets.size(); ++i) {
@@ -185,9 +186,14 @@ public class RobotContainer {
     }
   }
 
+  private static boolean isBlue() {
+    boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
+    return isBlue;
+  }
+
   public Command getAutonomousCommand() {
     if (SystemToggles.useCompleteAuto) {
-      boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
+      boolean isBlue = isBlue();
       String pathFile = isBlue ? "Auto-Blue" : "Auto-Red";
       return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathFile));
     }
@@ -204,7 +210,7 @@ public class RobotContainer {
         7,
         sgs.getEntry("aim_0_tx").getDouble(0.0),
         sgs.getEntry("aim_0_ty").getDouble(0.0),
-        sgs.getEntry("aim_0_heading").getDouble(-140.0),
+        sgs.getEntry("aim_0_heading").getDouble(0.0),
         sgs.getEntry("aim_0_tolerance").getDouble(0.0)));
     targets.add(new LimelightTarget(
         7,
@@ -246,5 +252,16 @@ public class RobotContainer {
             sgs.getEntry("aim_2_tolerance").getDouble(0.0)));
 
     return targets;
+  }
+
+  public void updateLLTargetTelemetry() {
+    NetworkTableEntry focusT = NetworkTableInstance.getDefault().getTable("sgs").getEntry("ll_target");
+    int focus = (int)focusT.getInteger(0);
+    focusT.setInteger(focus);
+
+    List<LimelightTarget> targets = isBlue() ? blueTargets() : redTargets();
+    if (focus >= 0 && focus < targets.size()) {
+      targets.get(focus).find(drivetrainSubsystem.getHeading().getDegrees());
+    }
   }
 }
