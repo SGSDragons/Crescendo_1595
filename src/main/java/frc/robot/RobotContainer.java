@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.utilities.Constants.OperatorConstants;
@@ -41,10 +40,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RobotContainer {
+  private final boolean compressorOnly = false;
+
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   private final LauncherSubsystem launcherSubsystem = new LauncherSubsystem();
-  private final PneumaticsSubsystem pneumaticsSubsystem = new PneumaticsSubsystem();
+  public final PneumaticsSubsystem pneumaticsSubsystem = new PneumaticsSubsystem();
 
   private final Joystick driver = new Joystick(OperatorConstants.driverControllerPort);
   private final Joystick operator = new Joystick(OperatorConstants.operatorControllerPort);
@@ -72,8 +73,6 @@ public class RobotContainer {
   private final JoystickButton indexerOuttake = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
 
   private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kX.value);
-
-
   
   private final JoystickButton compressor = new JoystickButton(operator, XboxController.Button.kRightStick.value);
 
@@ -84,15 +83,17 @@ public class RobotContainer {
 
     registerNamedCommands();
 
-    drivetrainSubsystem.setDefaultCommand(
-      new TeleopDrive(
-          drivetrainSubsystem,
-          () -> -driver.getRawAxis(translationAxis),
-          () -> -driver.getRawAxis(strafeAxis),
-          () -> -driver.getRawAxis(rotationAxis),
-          () -> robotCentric.getAsBoolean()
-        )
-    );
+    if (!compressorOnly) {
+      drivetrainSubsystem.setDefaultCommand(
+        new TeleopDrive(
+            drivetrainSubsystem,
+            () -> -driver.getRawAxis(translationAxis),
+            () -> -driver.getRawAxis(strafeAxis),
+            () -> -driver.getRawAxis(rotationAxis),
+            () -> robotCentric.getAsBoolean()
+          )
+      );
+    }
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -128,6 +129,10 @@ public class RobotContainer {
     }
 
     //Keybinds for... actually driving the robot in TeleOP.
+    if (compressorOnly) {
+      return;
+    }
+
     zeroGyro.onTrue(new InstantCommand(() -> drivetrainSubsystem.zeroHeading()));
 
     slowAim.whileTrue(new TeleopDrive(
@@ -172,7 +177,9 @@ public class RobotContainer {
   }
   
   private void registerNamedCommands() {
-    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(2.5));
+    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(1.5));
+    NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true).withTimeout(1.5));
+    NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.5));
     NamedCommands.registerCommand("Intake", new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(0.85)
       .andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
 
@@ -192,6 +199,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
+    drivetrainSubsystem.zeroHeading();
     if (SystemToggles.useCompleteAuto) {
       boolean isBlue = isBlue();
       String pathFile = isBlue ? "Auto-Blue" : "Auto-Red";
