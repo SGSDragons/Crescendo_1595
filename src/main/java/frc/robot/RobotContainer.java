@@ -154,7 +154,7 @@ public class RobotContainer {
     indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_DISREGARD_LOADING)); //Does not check for if note is loaded
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
 
-    autoAim.whileTrue(new Aim(blueTargets().get(0), drivetrainSubsystem));
+    //autoAim.whileTrue(new Aim(blueTargets().get(0), drivetrainSubsystem));
 
    
     
@@ -186,9 +186,14 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
-    String pathFile = isBlue ? "Auto-Blue" : "Auto-Red";
-    return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathFile));
+    if (SystemToggles.useCompleteAuto) {
+      boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
+      String pathFile = isBlue ? "Auto-Blue" : "Auto-Red";
+      return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathFile));
+    }
+    else {
+      return autoChooser.getSelected();
+    }
   }
 
   public List<LimelightTarget> blueTargets() {

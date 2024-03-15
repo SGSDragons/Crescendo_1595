@@ -91,7 +91,7 @@ public final class Constants {
 
   public static final class SystemToggles {
     public static final boolean systemIdentification = false;
-    public static final boolean useAustinsWackyAhController = false; //Turn to true when it works idk
+    public static final boolean useCompleteAuto = false;
   }
   
   public static final class SwerveConstants {
