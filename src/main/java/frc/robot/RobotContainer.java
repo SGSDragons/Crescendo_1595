@@ -16,8 +16,6 @@ import frc.lib.utilities.LimelightTarget;
 import frc.robot.commands.*;
 import frc.robot.commands.Index.IndexDirection;
 import frc.robot.commands.Launch.LaunchDirection;
-import frc.robot.commands.Index;
-import frc.robot.commands.Launch;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
@@ -37,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.utilities.Constants.OperatorConstants;
 import frc.lib.utilities.Constants.SystemToggles;
-import frc.robot.commands.TeleopDrive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +69,8 @@ public class RobotContainer {
 
   private final JoystickButton indexerIntake = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
   private final JoystickButton indexerOuttake = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
+
+  private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kX.value);
 
 
   
@@ -155,6 +154,8 @@ public class RobotContainer {
     indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_DISREGARD_LOADING)); //Does not check for if note is loaded
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
 
+    autoAim.whileTrue(new Aim(blueTargets().get(0), drivetrainSubsystem));
+
    
     
     climberUp.onTrue(new InstantCommand(() -> {
@@ -179,23 +180,15 @@ public class RobotContainer {
     boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
     List<LimelightTarget> targets = isBlue ? blueTargets() : redTargets();
 
-    CommandScheduler.getInstance().schedule(new Command() {
-      @Override
-      public void execute() {
-        // If there's a valid target, report metrics on it (visible, error, etc)
-        int focus = (int)sgs.getEntry("target").getInteger(0);
-        if (focus < targets.size()) {
-          targets.get(focus).find(drivetrainSubsystem.getHeading().getDegrees()); //Why are we doing this here if the values aren't being saved and its also happening in the Aim command?
-        }
-      }
-    });
     for (int i=0; i < targets.size(); ++i) {
-      NamedCommands.registerCommand("Aim-"+i, new Aim(targets.get(i), drivetrainSubsystem));
+      NamedCommands.registerCommand("aim-"+i, new Aim(targets.get(i), drivetrainSubsystem));
     }
   }
 
   public Command getAutonomousCommand() {
-    return AutoBuilder.followPath(PathPlannerPath.fromPathFile("Auto")); //Should this change to Auto-Red and Auto-Blue?
+    boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
+    String pathFile = isBlue ? "Auto-Blue" : "Auto-Red";
+    return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathFile));
   }
 
   public List<LimelightTarget> blueTargets() {

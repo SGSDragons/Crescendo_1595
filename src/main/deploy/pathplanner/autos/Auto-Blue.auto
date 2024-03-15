@@ -67,9 +67,34 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "bpath-2"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "bpath-2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "aim-2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LaunchNoteLow"
           }
         }
       ]
