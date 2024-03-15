@@ -73,7 +73,7 @@ public class RobotContainer {
   private final JoystickButton indexerOuttake = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
 
   private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kX.value);
-  
+
   private final JoystickButton compressor = new JoystickButton(operator, XboxController.Button.kRightStick.value);
 
   private final SendableChooser<Command> autoChooser;
@@ -161,9 +161,12 @@ public class RobotContainer {
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
 
     //autoAim.whileTrue(new Aim(blueTargets().get(0), drivetrainSubsystem));
+    int speakerTag = isBlue() ? 7 : 4;
+    autoAim.whileTrue(new TwistAim(
+            new LimelightTarget(speakerTag, 0, 0, 0, 2),
+            drivetrainSubsystem
+          ));
 
-   
-    
     climberUp.onTrue(new InstantCommand(() -> {
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.leftClimber);
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.rightClimber);
