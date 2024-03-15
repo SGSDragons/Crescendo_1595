@@ -229,19 +229,19 @@ public class RobotContainer {
     List<LimelightTarget> targets = new ArrayList<>(); //Is it planned for this to have the same targets but with a different tag or something completely different?
 
     targets.add(new LimelightTarget(
-            7,
+            4,
             sgs.getEntry("aim_0_tx").getDouble(0.0),
             sgs.getEntry("aim_0_ty").getDouble(0.0),
             sgs.getEntry("aim_0_heading").getDouble(-35.0),
             sgs.getEntry("aim_0_tolerance").getDouble(0.0)));
     targets.add(new LimelightTarget(
-            7,
+            4,
             sgs.getEntry("aim_1_tx").getDouble(0.0),
             sgs.getEntry("aim_1_ty").getDouble(0.0),
             sgs.getEntry("aim_1_heading").getDouble(-25.0),
             sgs.getEntry("aim_1_tolerance").getDouble(0.0)));
     targets.add(new LimelightTarget(
-            7,
+            4,
             sgs.getEntry("aim_2_tx").getDouble(0.0),
             sgs.getEntry("aim_2_ty").getDouble(0.0),
             sgs.getEntry("aim_2_heading").getDouble(0.0),
