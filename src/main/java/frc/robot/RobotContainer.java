@@ -76,7 +76,7 @@ public class RobotContainer {
   
   private final JoystickButton compressor = new JoystickButton(operator, XboxController.Button.kRightStick.value);
 
-  private final SendableChooser<Command> autoChooser;
+  private SendableChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -181,8 +181,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true).withTimeout(1.5));
     NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.5));
     NamedCommands.registerCommand("Intake",
-      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(1.1)
-      .andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
+      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(2.0).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
 
     NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
 
