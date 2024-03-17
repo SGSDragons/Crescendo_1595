@@ -12,17 +12,9 @@ public class TwistAim extends Command {
     public final LimelightTarget target;
     public DrivetrainSubsystem drivetrainSubsystem;
 
-    // These values will be used unless defined in NT's aim parameters
-    public final double defaultHeadingGain = 0.0;
-
-    NetworkTableEntry headingGain;
-
     public TwistAim(LimelightTarget target, DrivetrainSubsystem drivetrainSubsystem) {
         this.target = target;
         this.drivetrainSubsystem = drivetrainSubsystem;
-
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("alignment_pid");
-        headingGain = table.getEntry("heading_gain");
     }
 
     /** The initial subroutine of a command. Called once when the command is initially scheduled. */
@@ -43,7 +35,7 @@ public class TwistAim extends Command {
             return;
         }
 
-        double dTheta = error.x * headingGain.getDouble(defaultHeadingGain);
+        double dTheta = error.x * Aim.headingGain.getDouble(0.0);
 
         drivetrainSubsystem.drive(
                 new Translation2d(0, 0),

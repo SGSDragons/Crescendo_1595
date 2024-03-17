@@ -11,25 +11,31 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 public class Aim extends Command {
 
     public final LimelightTarget target;
+    public final double tolerance;
     public DrivetrainSubsystem drivetrainSubsystem;
 
-    // These values will be used unless defined in NT's aim parameters
-    public final double defaultXGain = 0.0;
-    public final double defaultYGain = 0.0;
-    public final double defaultHeadingGain = 0.0;
 
-    NetworkTableEntry xGain;
-    NetworkTableEntry yGain;
-    NetworkTableEntry headingGain;
-
-    public Aim(LimelightTarget target, DrivetrainSubsystem drivetrainSubsystem) {
-        this.target = target;
-        this.drivetrainSubsystem = drivetrainSubsystem;
-
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("alignment_pid");
+    public static final NetworkTableEntry xGain;
+    public static final NetworkTableEntry yGain;
+    public static final NetworkTableEntry headingGain;
+    static {
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("aim_pid");
         xGain = table.getEntry("x_gain");
         yGain = table.getEntry("y_gain");
         headingGain = table.getEntry("heading_gain");
+
+        // These values will be used unless edited in NT's aim parameters
+        // Find good values in testing, then hard code them here.
+        xGain.setDouble(0.0);
+        yGain.setDouble(0.0);
+        headingGain.setDouble(0.0);
+    }
+
+
+    public Aim(LimelightTarget target, double tolerance, DrivetrainSubsystem drivetrainSubsystem) {
+        this.target = target;
+        this.tolerance = tolerance;
+        this.drivetrainSubsystem = drivetrainSubsystem;
     }
 
     /** The initial subroutine of a command. Called once when the command is initially scheduled. */
@@ -50,9 +56,9 @@ public class Aim extends Command {
             return;
         }
 
-        double strafeValue = error.x * xGain.getDouble(defaultXGain);
-        double translationValue = error.y * yGain.getDouble(defaultYGain);
-        double dTheta = error.heading * headingGain.getDouble(defaultHeadingGain);
+        double strafeValue = error.x * xGain.getDouble(0.0);
+        double translationValue = error.y * yGain.getDouble(0.0);
+        double dTheta = error.heading * headingGain.getDouble(0.0);
 
         drivetrainSubsystem.drive(
                 new Translation2d(translationValue, strafeValue),
@@ -80,15 +86,18 @@ public class Aim extends Command {
      *
      * @return whether the command has finished.
      */
+
+    int misses = 0;
     public boolean isFinished() {
         LimelightTarget.Error error = target.find(drivetrainSubsystem.getHeading().getDegrees());
 
         if (error == null) {
-            // Keep trying?
-            return false;
+            misses += 1;
+            // Give up if there are more than 20 checks and the tag isn't found.
+            return misses > 20;
         }
 
-        return error.x == 0 && error.y == 0 && error.heading == 0;
+        misses = 0;
+        return Math.abs(error.x) < tolerance && Math.abs(error.y) < tolerance && error.heading == 3;
     }
-
 }
