@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 2.388630614052376,
-        "y": 6.716180956566617
+        "x": 2.281022254352202,
+        "y": 6.610851683241828
       },
       "prevControl": {
-        "x": 2.3681610157309945,
-        "y": 6.716180956566617
+        "x": 2.2605526560308205,
+        "y": 6.610851683241828
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "bshot-0"
+      "linkedName": "t path 0 end"
     }
   ],
   "rotationTargets": [
@@ -57,21 +57,21 @@
     },
     {
       "waypointRelativePos": 2,
-      "rotationDegrees": 42.11,
+      "rotationDegrees": 33.340707346477004,
       "rotateFast": false
     }
   ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 6.0,
+    "maxAcceleration": 6.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 44.3704013915897,
+    "rotation": 31.70142966950569,
     "rotateFast": false
   },
   "reversed": false,

@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.41294931829144405,
-      "y": 4.2352248466599285
+      "x": 0.39643617748774124,
+      "y": 7.15
     },
     "rotation": 0
   },
@@ -12,9 +12,15 @@
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 7.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "tcenter0"
+            "pathName": "bpath-0"
           }
         },
         {
@@ -24,22 +30,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "wait",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "IntakeLong"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "tcenter1"
-                }
-              }
-            ]
+            "waitTime": 0.25
           }
         },
         {
@@ -51,7 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "tpath park 1"
+            "pathName": "quickPark"
           }
         }
       ]

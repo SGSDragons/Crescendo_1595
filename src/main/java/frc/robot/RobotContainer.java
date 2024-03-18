@@ -9,9 +9,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.lib.utilities.Constants;
 
 import frc.lib.utilities.LimelightTarget;
 import frc.robot.commands.*;
@@ -32,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.utilities.Constants.OperatorConstants;
 import frc.lib.utilities.Constants.SystemToggles;
@@ -58,8 +56,8 @@ public class RobotContainer {
   private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
   private final JoystickButton slowAim = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
 
-  private final JoystickButton climberUp = new JoystickButton(driver, XboxController.Button.kY.value);
-  private final JoystickButton climberDown = new JoystickButton(driver, XboxController.Button.kA.value);
+  private final JoystickButton climberUp = new JoystickButton(operator, XboxController.Button.kLeftStick.value);
+  private final JoystickButton climberDown = new JoystickButton(operator, XboxController.Button.kRightStick.value);
 
   private final JoystickButton launchAmpAutomatic = new JoystickButton(operator, XboxController.Button.kStart.value);
   private final JoystickButton launchAmpManual = new JoystickButton(operator, XboxController.Button.kBack.value);
@@ -72,9 +70,9 @@ public class RobotContainer {
   private final JoystickButton indexerIntake = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
   private final JoystickButton indexerOuttake = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
 
-  private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kX.value);
+  //private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kX.value);
   
-  private final JoystickButton compressor = new JoystickButton(operator, XboxController.Button.kRightStick.value);
+  private final JoystickButton compressor = new JoystickButton(driver, XboxController.Button.kX.value);
 
   private SendableChooser<Command> autoChooser;
 
@@ -104,6 +102,15 @@ public class RobotContainer {
 
     SmartDashboard.putNumber("indexVolt", 6.0);
     SmartDashboard.putNumber("intakeVolt", 3.0);
+
+    //Drive SmartDashboard
+    SmartDashboard.putNumber("AngleKP", 100.0);
+    SmartDashboard.putNumber("DriveKP", 0.12);
+    SmartDashboard.putNumber("DriveKS", 0.32);
+    SmartDashboard.putNumber("DriveKV", 1.51);
+    SmartDashboard.putNumber("DriveKA", 0.27);
+    SmartDashboard.putNumber("AutoKPX", 3);
+    SmartDashboard.putNumber("", rotationAxis)
 
     // Configure button bindings
     configureBindings();
@@ -182,6 +189,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.5));
     NamedCommands.registerCommand("Intake",
       new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(2.0).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
+
+    NamedCommands.registerCommand("IntakeLong",
+      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(7.7).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
 
     NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
 

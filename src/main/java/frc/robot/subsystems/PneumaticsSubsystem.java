@@ -22,7 +22,7 @@ public class PneumaticsSubsystem extends SubsystemBase{
         noteAimerRight = new DoubleSolenoid(2, PneumaticsModuleType.REVPH, HardwareID.rightNoteAimerForwardChannel, HardwareID.rightNoteAimerReverseChannel);
 
         compressor = new Compressor(2, PneumaticsModuleType.REVPH);
-        compressor.enableDigital();
+        compressor.disable();
 
         setAllSolenoidsToReverse();
     }
