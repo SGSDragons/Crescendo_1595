@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.291141026726498,
+        "y": 2.4443315553297777
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.121609798775154,
+        "y": 2.9977704399853247
+      },
+      "isLocked": false,
+      "linkedName": "bend7"
+    },
+    {
+      "anchor": {
+        "x": 2.3,
+        "y": 5.545677758022182
+      },
+      "prevControl": {
+        "x": 3.4277622555245104,
+        "y": 5.691869161516101
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "bshot-2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 150.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

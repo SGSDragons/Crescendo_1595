@@ -168,9 +168,12 @@ public class RobotContainer {
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
 
     //autoAim.whileTrue(new Aim(blueTargets().get(0), drivetrainSubsystem));
+    int speakerTag = isBlue() ? 7 : 4;
+    autoAim.whileTrue(new TwistAim(
+            new LimelightTarget(speakerTag, 0, 0, 0),
+            drivetrainSubsystem
+          ));
 
-   
-    
     climberUp.onTrue(new InstantCommand(() -> {
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.leftClimber);
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.rightClimber);
@@ -199,13 +202,13 @@ public class RobotContainer {
     List<LimelightTarget> targets = isBlue ? blueTargets() : redTargets();
 
     for (int i=0; i < targets.size(); ++i) {
-      NamedCommands.registerCommand("aim-"+i, new Aim(targets.get(i), drivetrainSubsystem));
+      // Play with tolerance until we are happy it gets close enough fast enough.
+      NamedCommands.registerCommand("aim-"+i, new Aim(targets.get(i), 0.5, drivetrainSubsystem));
     }
   }
 
   private static boolean isBlue() {
-    boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
-    return isBlue;
+    return DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
   }
 
   public Command getAutonomousCommand() {
@@ -228,20 +231,17 @@ public class RobotContainer {
         7,
         sgs.getEntry("aim_0_tx").getDouble(0.0),
         sgs.getEntry("aim_0_ty").getDouble(0.0),
-        sgs.getEntry("aim_0_heading").getDouble(0.0),
-        sgs.getEntry("aim_0_tolerance").getDouble(0.0)));
+        sgs.getEntry("aim_0_heading").getDouble(-150.0)));
     targets.add(new LimelightTarget(
         7,
         sgs.getEntry("aim_1_tx").getDouble(0.0),
         sgs.getEntry("aim_1_ty").getDouble(0.0),
-        sgs.getEntry("aim_1_heading").getDouble(-160.0),
-        sgs.getEntry("aim_1_tolerance").getDouble(0.0)));
+        sgs.getEntry("aim_1_heading").getDouble(-160.0)));
     targets.add(new LimelightTarget(
         7,
         sgs.getEntry("aim_2_tx").getDouble(0.0),
         sgs.getEntry("aim_2_ty").getDouble(0.0),
-        sgs.getEntry("aim_2_heading").getDouble(-180.0),
-        sgs.getEntry("aim_2_tolerance").getDouble(0.0)));
+        sgs.getEntry("aim_2_heading").getDouble(-180.0)));
 
     return targets;
   }
@@ -252,22 +252,19 @@ public class RobotContainer {
 
     targets.add(new LimelightTarget(
             4,
-            sgs.getEntry("aim_0_tx").getDouble(0.0),
-            sgs.getEntry("aim_0_ty").getDouble(0.0),
-            sgs.getEntry("aim_0_heading").getDouble(-35.0),
-            sgs.getEntry("aim_0_tolerance").getDouble(0.0)));
+            sgs.getEntry("aim_0_tx").getDouble(-12.0),
+            sgs.getEntry("aim_0_ty").getDouble(8.0),
+            sgs.getEntry("aim_0_heading").getDouble(0.0)));
     targets.add(new LimelightTarget(
             4,
             sgs.getEntry("aim_1_tx").getDouble(0.0),
             sgs.getEntry("aim_1_ty").getDouble(0.0),
-            sgs.getEntry("aim_1_heading").getDouble(-25.0),
-            sgs.getEntry("aim_1_tolerance").getDouble(0.0)));
+            sgs.getEntry("aim_1_heading").getDouble(-25.0)));
     targets.add(new LimelightTarget(
             4,
             sgs.getEntry("aim_2_tx").getDouble(0.0),
             sgs.getEntry("aim_2_ty").getDouble(0.0),
-            sgs.getEntry("aim_2_heading").getDouble(0.0),
-            sgs.getEntry("aim_2_tolerance").getDouble(0.0)));
+            sgs.getEntry("aim_2_heading").getDouble(0.0)));
 
     return targets;
   }

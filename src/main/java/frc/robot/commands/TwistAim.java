@@ -8,33 +8,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.utilities.LimelightTarget;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
-public class Aim extends Command {
-
+public class TwistAim extends Command {
     public final LimelightTarget target;
-    public final double tolerance;
     public DrivetrainSubsystem drivetrainSubsystem;
 
-
-    public static final NetworkTableEntry xGain;
-    public static final NetworkTableEntry yGain;
-    public static final NetworkTableEntry headingGain;
-    static {
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("aim_pid");
-        xGain = table.getEntry("x_gain");
-        yGain = table.getEntry("y_gain");
-        headingGain = table.getEntry("heading_gain");
-
-        // These values will be used unless edited in NT's aim parameters
-        // Find good values in testing, then hard code them here.
-        xGain.setDouble(0.0);
-        yGain.setDouble(0.0);
-        headingGain.setDouble(0.0);
-    }
-
-
-    public Aim(LimelightTarget target, double tolerance, DrivetrainSubsystem drivetrainSubsystem) {
+    public TwistAim(LimelightTarget target, DrivetrainSubsystem drivetrainSubsystem) {
         this.target = target;
-        this.tolerance = tolerance;
         this.drivetrainSubsystem = drivetrainSubsystem;
     }
 
@@ -56,12 +35,10 @@ public class Aim extends Command {
             return;
         }
 
-        double strafeValue = error.x * xGain.getDouble(0.0);
-        double translationValue = error.y * yGain.getDouble(0.0);
-        double dTheta = error.heading * headingGain.getDouble(0.0);
+        double dTheta = error.x * Aim.headingGain.getDouble(0.0);
 
         drivetrainSubsystem.drive(
-                new Translation2d(translationValue, strafeValue),
+                new Translation2d(0, 0),
                 dTheta,
                 false,
                 false);
@@ -86,18 +63,14 @@ public class Aim extends Command {
      *
      * @return whether the command has finished.
      */
-
-    int misses = 0;
     public boolean isFinished() {
         LimelightTarget.Error error = target.find(drivetrainSubsystem.getHeading().getDegrees());
 
         if (error == null) {
-            misses += 1;
-            // Give up if there are more than 20 checks and the tag isn't found.
-            return misses > 20;
+            // Keep trying?
+            return false;
         }
 
-        misses = 0;
-        return Math.abs(error.x) < tolerance && Math.abs(error.y) < tolerance && error.heading == 3;
+        return error.x == 0;
     }
 }
