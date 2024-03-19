@@ -1,10 +1,12 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utilities.LimelightHelpers;
 import frc.lib.utilities.Constants.HardwareID;
+import frc.lib.utilities.Constants.Keys;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -38,7 +40,7 @@ public class IndexerSubsystem extends SubsystemBase{
 
     public void indexNoteIntake() {
         if (!noteLoaded) {
-            indexerMotor.setVoltage(SmartDashboard.getNumber("intakeVolt", 3.00));
+            indexerMotor.setVoltage(Preferences.getDouble(Keys.intakeVoltKey, 3.0));
             return;
         }
 
@@ -46,20 +48,16 @@ public class IndexerSubsystem extends SubsystemBase{
     }
 
     public void indexNoteOuttake() {
-        indexerMotor.setVoltage(-SmartDashboard.getNumber("intakeVolt", 3.00));
+        indexerMotor.setVoltage(-Preferences.getDouble(Keys.intakeVoltKey, 3.0));
     }
 
-    public void indexNoteLaunchSpeaker() {
-        indexerMotor.setVoltage(SmartDashboard.getNumber("indexVolt", 6.00));
+    public void indexNoteLaunchSpeaker(boolean ampShot) {
+        double voltage = ampShot ? Preferences.getDouble(Keys.indexAmpVoltKey, 1.5) : Preferences.getDouble(Keys.indexVoltKey, 6.0);
+        indexerMotor.setVoltage(voltage);
     }
 
-    public void indexNoteLaunchSpeaker(double multiplier) {
-        indexerMotor.setVoltage(SmartDashboard.getNumber("indexVolt", 6.00) * multiplier);
-    }
-
-    //Used for Testing Purposes
     public void indexNoteIntakeDisregardLoading() {
-        indexerMotor.setVoltage(SmartDashboard.getNumber("intakeVolt", 3.00));
+        indexerMotor.setVoltage(Preferences.getDouble(Keys.intakeVoltKey, 3.0));
     }
     
     @Override
@@ -92,7 +90,7 @@ public class IndexerSubsystem extends SubsystemBase{
     public boolean isNoteLoaded() {
         return noteLoaded;
     }
-    
+
     public void telemetry() {
         SmartDashboard.putNumber("Indexer Motor Velocity", indexerMotor.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Intake Motor Velocity", intakeMotor.getVelocity().getValueAsDouble());

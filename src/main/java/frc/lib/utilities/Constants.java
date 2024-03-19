@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.utilities.swerve.COTSTalonFXSwerveConstants;
 import frc.lib.utilities.swerve.SwerveModuleConstants;
 
@@ -90,7 +92,7 @@ public final class Constants {
   }
 
   public static final class SystemToggles {
-    public static final boolean systemIdentification = false;
+    public static boolean systemIdentification = false;
     public static final boolean useCompleteAuto = false;
   }
   
@@ -141,27 +143,37 @@ public final class Constants {
          public static final double closedLoopRamp = 0.0;
   
          /* Angle Motor PID Values */
-         public static final double angleKP = chosenModule.angleKP;
+         //public static final double angleKP = chosenModule.angleKP;
+         public static final double angleKP = Preferences.getDouble(Keys.angle_kPKey, 100.0);
          public static final double angleKI = chosenModule.angleKI;
          public static final double angleKD = chosenModule.angleKD;
   
          /* Drive Motor PID Values */
-         public static final double driveKP = 0.12; //TODO: This must be tuned to specific robot
+         //public static final double driveKP = 0.12; //TODO: This must be tuned to specific robot
+         public static double driveKP = Preferences.getDouble(Keys.drive_kPKey, 0.12);
+
          public static final double driveKI = 0.0;
          public static final double driveKD = 0.0;
          public static final double driveKF = 0.0;
   
          /* Drive Motor Characterization Values From SYSID */
-         public static final double driveKS = 0.32; //TODO: This must be tuned to specific robot
-         public static final double driveKV = 1.51;
-         public static final double driveKA = 0.27;
+         //public static final double driveKS = 0.32; //TODO: This must be tuned to specific robot
+         //public static final double driveKV = 1.51;
+         //public static final double driveKA = 0.27;
+
+         public static double driveKS = Preferences.getDouble(Keys.drive_kSKey, 0.32);
+         public static double driveKV = Preferences.getDouble(Keys.drive_kVKey, 1.51);
+         public static double driveKA = Preferences.getDouble(Keys.drive_kAKey, 0.27);
   
          /* Swerve Profiling Values */
          /** Meters per Second */
-         public static final double maxSpeed = 3.0; //TODO: This must be tuned to specific robot
+         //public static final double maxSpeed = 3.0; //TODO: This must be tuned to specific robot
          /** Radians per Second */
-         public static final double maxAngularVelocity = 8.0; //TODO: This must be tuned to specific robot
-  
+         //public static final double maxAngularVelocity = 8.0; //TODO: This must be tuned to specific robot
+
+         public static double maxSpeed = Preferences.getDouble(Keys.maxSpeedKey, 4.3);
+         public static double maxAngularVelocity = Preferences.getDouble(Keys.maxAngularVelocityKey, 14.0);
+
          /* Neutral Modes */
          public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
          public static final NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
@@ -214,9 +226,14 @@ public final class Constants {
          public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
          public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
      
-         public static final double kPXController = 3;
-         public static final double kPYController = 3;
-         public static final double kPThetaController = 4;
+         /*
+          public static final double kPXController = 3;
+          public static final double kPYController = 3;
+          public static final double kPThetaController = 4;
+          */
+
+          public static double kPXController = Preferences.getDouble(Keys.auto_kPXKey, 3);
+          public static double kPThetaController = Preferences.getDouble(Keys.auto_kPThetaKey, 4);
      
          /* Constraint for the motion profilied robot angle controller */
          public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -225,11 +242,35 @@ public final class Constants {
 
     
 
-          public static final HolonomicPathFollowerConfig pathPlannerConfig = new HolonomicPathFollowerConfig(
+          public static HolonomicPathFollowerConfig pathPlannerConfig = new HolonomicPathFollowerConfig(
             new PIDConstants(AutoConstants.kPXController, 0, 0),
             new PIDConstants(AutoConstants.kPThetaController, 0, 0),
             SwerveConstants.maxSpeed,
             SwerveConstants.driveBaseRadius,
             new ReplanningConfig(false, false));
+     }
+
+     public static final class Keys {
+      // Driving
+      public static final String angle_kPKey = "Angle kP";
+      public static final String drive_kPKey = "Drive kP";
+      public static final String drive_kSKey = "Drive kS";
+      public static final String drive_kVKey = "Drive kV";
+      public static final String drive_kAKey = "Drive kA";
+      public static final String auto_kPXKey = "Auto kP X";
+      public static final String auto_kPThetaKey = "Auto kP Theta";
+      public static final String maxSpeedKey = "Max Speed";
+      public static final String maxAngularVelocityKey = "Max Angular Velocity";
+
+      // Intake, Index, Launch
+      public static final String indexVoltKey = "Indexer Voltage";
+      public static final String indexAmpVoltKey = "Indexer Amp-Shot Voltage";
+      public static final String intakeVoltKey = "Intake Voltage";
+      public static final String speakerHighAimV = "Speaker-Shot High-Aim Velocity";
+      public static final String speakerLowAimV = "Speaker-Shot Lower-Aim Velocity";
+      public static final String ampV = "Amplifier-Shot Velocity";
+      public static final String launcherTolerance = "Launcher Tolerance";
+
+
      }
 }

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.utilities.Constants.SystemToggles;
 import frc.lib.utilities.swerve.CTREConfigs;
 
 /**
@@ -102,6 +103,9 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    m_robotContainer.pneumaticsSubsystem.disableCompressor();
+    SystemToggles.systemIdentification = true;
   }
 
   @Override

@@ -8,9 +8,11 @@ import java.util.function.BooleanSupplier;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utilities.Constants.HardwareID;
+import frc.lib.utilities.Constants.Keys;
 import frc.lib.utilities.Constants.TuningValues;
 import frc.robot.commands.Launch.LaunchDirection;
 
@@ -18,12 +20,9 @@ public class LauncherSubsystem extends SubsystemBase{
 
     TalonFX bottomSpinner, middleSpinner, topSpinner;
 
-    private double upperTargetV = 80;
-    private double lowerTargetV = -80;
+    private double upperSpinnerTargetV, lowerSpinnerTargetV;
 
-    VelocityVoltage topVelocity;
-    VelocityVoltage middleVelocity;
-    VelocityVoltage bottomVelocity;
+    VelocityVoltage upperSpinnerVelocity, middleSpinnerVelocity, bottomSpinnerVelocity;
 
     public BooleanSupplier isLauncherSpinning = () -> false;
 
@@ -37,9 +36,9 @@ public class LauncherSubsystem extends SubsystemBase{
         middleSpinner.setNeutralMode(NeutralModeValue.Coast);
         topSpinner.setNeutralMode(NeutralModeValue.Coast);
 
-        topVelocity = new VelocityVoltage(0);
-        middleVelocity = new VelocityVoltage(0);
-        bottomVelocity = new VelocityVoltage(0);
+        upperSpinnerVelocity = new VelocityVoltage(0);
+        middleSpinnerVelocity = new VelocityVoltage(0);
+        bottomSpinnerVelocity = new VelocityVoltage(0);
     }
 
     public void spinUpperSpinners(boolean ampShot) {
@@ -50,18 +49,13 @@ public class LauncherSubsystem extends SubsystemBase{
         config.kI = TuningValues.launcherkI;
         config.kD = TuningValues.launcherkD;
         
-        if (ampShot) {
-            upperTargetV = SmartDashboard.getNumber("upperAmpV", 40);
-        }
-        else {
-            upperTargetV = SmartDashboard.getNumber("upperSpeakerV", 80);
-        }
+        upperSpinnerTargetV = ampShot ? Preferences.getDouble(Keys.ampV, 40) : Preferences.getDouble(Keys.speakerHighAimV, 80);
 
         topSpinner.getConfigurator().apply(config);
         middleSpinner.getConfigurator().apply(config);
 
-        topSpinner.setControl(topVelocity.withVelocity(upperTargetV));
-        middleSpinner.setControl(middleVelocity.withVelocity(upperTargetV));
+        topSpinner.setControl(upperSpinnerVelocity.withVelocity(upperSpinnerTargetV));
+        middleSpinner.setControl(middleSpinnerVelocity.withVelocity(upperSpinnerTargetV));
     }
 
     public void spinLowerSpinners() {
@@ -72,25 +66,19 @@ public class LauncherSubsystem extends SubsystemBase{
         config.kI = TuningValues.launcherkI;
         config.kD = TuningValues.launcherkD;
 
-        lowerTargetV = SmartDashboard.getNumber("lowerSpeakerV", -80);
+        lowerSpinnerTargetV =  Preferences.getDouble(Keys.speakerLowAimV, -80);
 
         middleSpinner.getConfigurator().apply(config);
         bottomSpinner.getConfigurator().apply(config);
 
-        middleSpinner.setControl(middleVelocity.withVelocity(lowerTargetV));
-        bottomSpinner.setControl(bottomVelocity.withVelocity(lowerTargetV));
+        middleSpinner.setControl(middleSpinnerVelocity.withVelocity(lowerSpinnerTargetV));
+        bottomSpinner.setControl(bottomSpinnerVelocity.withVelocity(lowerSpinnerTargetV));
     }
 
     public void stopSpinners() {
         bottomSpinner.set(0.0);
         middleSpinner.set(0.0);
         topSpinner.set(0.0);                     
-
-        /*
-        bottomSpinner.set(0.0);
-        middleSpinner.set(0.0);
-        topSpinner.set(0.0);
-        */
     }
 
     public boolean isLauncherUpToSpeed(LaunchDirection direction) {
@@ -98,19 +86,19 @@ public class LauncherSubsystem extends SubsystemBase{
         double upperMaxVelocity;
 
         if (direction == LaunchDirection.AMP) {
-            lowerMaxVelocity = -SmartDashboard.getNumber("upperAmpV", 40);
-            upperMaxVelocity = SmartDashboard.getNumber("upperAmpV", 40);
+            lowerMaxVelocity = -Preferences.getDouble(Keys.ampV, 40);
+            upperMaxVelocity = Preferences.getDouble(Keys.ampV, 40);
         }
         else {
-            lowerMaxVelocity = SmartDashboard.getNumber("lowerSpeakerV", -80);
-            upperMaxVelocity = SmartDashboard.getNumber("upperSpeakerV", 80);
+            lowerMaxVelocity = Preferences.getDouble(Keys.speakerLowAimV, -80);
+            upperMaxVelocity = Preferences.getDouble(Keys.speakerHighAimV, 80);
         }
 
         double bottomSpinnerVelocity = bottomSpinner.getVelocity().getValueAsDouble();
         double topSpinnerVelocity = topSpinner.getVelocity().getValueAsDouble();
         double middleSpinnerVelocity = middleSpinner.getVelocity().getValueAsDouble();
 
-        double tolerance = 15;
+        double tolerance = Preferences.getDouble(Keys.launcherTolerance, 15);
 
         if ((bottomSpinnerVelocity < lowerMaxVelocity + tolerance) || (topSpinnerVelocity > upperMaxVelocity - tolerance)) {
           if ((middleSpinnerVelocity < lowerMaxVelocity + tolerance) || (middleSpinnerVelocity > upperMaxVelocity - tolerance)) {

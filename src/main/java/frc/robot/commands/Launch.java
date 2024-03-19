@@ -58,11 +58,7 @@ public class Launch extends Command {
     }
     
     if (launcherSubsystem.isLauncherUpToSpeed(direction) && automatic) {
-      if (direction == LaunchDirection.AMP) {
-        indexerSubsystem.indexNoteLaunchSpeaker(0.5);
-      }
-
-      indexerSubsystem.indexNoteLaunchSpeaker();
+      indexerSubsystem.indexNoteLaunchSpeaker(direction == LaunchDirection.AMP);
     }
 
   }

@@ -38,7 +38,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public SwerveDriveOdometry swerveDriveOdometry;
   public SwerveModule[] swerveModules;
   public AHRS navx;
-  //private double highestMeasuredVelocity = 0;
+  private double highestMeasuredVelocity = 0;
 
   //System Identification
 
@@ -182,17 +182,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Module " + module.moduleNumber + " CANcoder", module.getCANcoder().getDegrees());
             SmartDashboard.putNumber("Module " + module.moduleNumber + " Angle", module.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Module " + module.moduleNumber + " Velocity", module.getState().speedMetersPerSecond);
-            /*if (module.getState().speedMetersPerSecond > highestMeasuredVelocity) {
+            if (module.getState().speedMetersPerSecond > highestMeasuredVelocity) {
               highestMeasuredVelocity = module.getState().speedMetersPerSecond;
             }
-            SmartDashboard.putNumber("Module " + module.moduleNumber + "MaximumSpeed", highestMeasuredVelocity);*/
           }     
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
+    SmartDashboard.putNumber("MaximumSpeed", highestMeasuredVelocity);
   }
 
   // Makes System Identification Routine for Mathematical Analysis. Runs two tests that apply specific voltages to motors and log their positions and velocities.
   private void createSytemIdentificationRoutine() {
-    sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(Units.Volts.per(Units.Second).of(0.2), Units.Volts.of(1.4), Units.Seconds.of(5)),
+    sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(Units.Volts.per(Units.Second).of(0.75), Units.Volts.of(5.25), Units.Seconds.of(5)),
     new SysIdRoutine.Mechanism(
       (Measure<Voltage> volts) -> {
         for(SwerveModule module : swerveModules) {

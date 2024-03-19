@@ -22,7 +22,10 @@ import frc.robot.subsystems.PneumaticsSubsystem;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import frc.lib.utilities.Constants.Keys;
+
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -70,7 +73,7 @@ public class RobotContainer {
   private final JoystickButton indexerIntake = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
   private final JoystickButton indexerOuttake = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
 
-  //private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kX.value);
+  private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kX.value);
   
   private final JoystickButton compressor = new JoystickButton(driver, XboxController.Button.kX.value);
 
@@ -94,23 +97,8 @@ public class RobotContainer {
     }
 
     autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    SmartDashboard.putNumber("upperSpeakerV", 80);
-    SmartDashboard.putNumber("lowerSpeakerV", -80);
-    SmartDashboard.putNumber("upperAmpV", 40);
-
-    SmartDashboard.putNumber("indexVolt", 6.0);
-    SmartDashboard.putNumber("intakeVolt", 3.0);
-
-    //Drive SmartDashboard
-    SmartDashboard.putNumber("AngleKP", 100.0);
-    SmartDashboard.putNumber("DriveKP", 0.12);
-    SmartDashboard.putNumber("DriveKS", 0.32);
-    SmartDashboard.putNumber("DriveKV", 1.51);
-    SmartDashboard.putNumber("DriveKA", 0.27);
-    SmartDashboard.putNumber("AutoKPX", 3);
-    SmartDashboard.putNumber("", rotationAxis)
+    initializeRobotPreferences();
 
     // Configure button bindings
     configureBindings();
@@ -278,5 +266,29 @@ public class RobotContainer {
     if (focus >= 0 && focus < targets.size()) {
       targets.get(focus).find(drivetrainSubsystem.getHeading().getDegrees());
     }
+  }
+
+  public void initializeRobotPreferences() {
+    // Driving
+    Preferences.initDouble(Keys.angle_kPKey, 100.0);
+    Preferences.initDouble(Keys.drive_kPKey, 0.12);
+    Preferences.initDouble(Keys.drive_kSKey, 0.32);
+    Preferences.initDouble(Keys.drive_kVKey, 1.51);
+    Preferences.initDouble(Keys.drive_kAKey, 0.27);
+    Preferences.initDouble(Keys.auto_kPXKey, 3);
+    Preferences.initDouble(Keys.auto_kPThetaKey, 4);
+    Preferences.initDouble(Keys.maxSpeedKey, 4.3);
+    Preferences.initDouble(Keys.maxAngularVelocityKey, 14.0);
+
+    //Intake, Index, Launch
+    Preferences.initDouble(Keys.indexVoltKey, 6.0);
+    Preferences.initDouble(Keys.indexAmpVoltKey, 1.5);
+    Preferences.initDouble(Keys.intakeVoltKey, 3.0);
+    Preferences.initDouble(Keys.speakerHighAimV, 80);
+    Preferences.initDouble(Keys.speakerLowAimV, -80);
+    Preferences.initDouble(Keys.ampV, 40);
+    Preferences.initDouble(Keys.launcherTolerance, 15);
+
+
   }
 }
