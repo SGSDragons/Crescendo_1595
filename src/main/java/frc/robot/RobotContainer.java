@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RobotContainer {
-  private final boolean compressorOnly = false;
+  private static boolean compressorOnly;
 
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
@@ -81,8 +81,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
+    initializeRobotPreferences();
     registerNamedCommands();
+
+    compressorOnly = Preferences.getBoolean(Keys.compressorOnlyKey, false);
 
     if (!compressorOnly) {
       drivetrainSubsystem.setDefaultCommand(
@@ -97,8 +99,7 @@ public class RobotContainer {
     }
 
     autoChooser = AutoBuilder.buildAutoChooser();
-
-    initializeRobotPreferences();
+    SmartDashboard.putData("Auto Mode", autoChooser);
 
     // Configure button bindings
     configureBindings();
@@ -107,7 +108,7 @@ public class RobotContainer {
   private void configureBindings() {
 
     //The keybinds and commands for system identification only load if the mode is enabled in constants (for programming purposes).
-    if (SystemToggles.systemIdentification) {
+    if (Preferences.getBoolean(Keys.characterizationKey, false)) {
       JoystickButton driveQuasiForward = new JoystickButton(driver, XboxController.Button.kBack.value);
       JoystickButton driveQuasiBackward = new JoystickButton(driver, XboxController.Button.kStart.value);
       JoystickButton driveDynamicForward = new JoystickButton(driver, XboxController.Button.kX.value);
@@ -125,6 +126,7 @@ public class RobotContainer {
 
     //Keybinds for... actually driving the robot in TeleOP.
     if (compressorOnly) {
+      pneumaticsSubsystem.enableCompressor();
       return;
     }
 
@@ -277,8 +279,8 @@ public class RobotContainer {
     Preferences.initDouble(Keys.drive_kAKey, 0.27);
     Preferences.initDouble(Keys.auto_kPXKey, 3);
     Preferences.initDouble(Keys.auto_kPThetaKey, 4);
-    Preferences.initDouble(Keys.maxSpeedKey, 4.3);
-    Preferences.initDouble(Keys.maxAngularVelocityKey, 14.0);
+    Preferences.initDouble(Keys.maxSpeedKey, 4.17);
+    Preferences.initDouble(Keys.maxAngularVelocityKey, 29.65);
 
     //Intake, Index, Launch
     Preferences.initDouble(Keys.indexVoltKey, 6.0);
@@ -288,6 +290,9 @@ public class RobotContainer {
     Preferences.initDouble(Keys.speakerLowAimV, -80);
     Preferences.initDouble(Keys.ampV, 40);
     Preferences.initDouble(Keys.launcherTolerance, 15);
+
+    Preferences.initBoolean(Keys.characterizationKey, false);
+    Preferences.initBoolean(Keys.compressorOnlyKey, false);
 
 
   }

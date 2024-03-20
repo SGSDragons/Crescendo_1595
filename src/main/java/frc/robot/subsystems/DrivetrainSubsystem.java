@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -188,15 +189,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
           }     
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
     SmartDashboard.putNumber("MaximumSpeed", highestMeasuredVelocity);
+    SmartDashboard.putNumber("NavX", -navx.getAngle()); //CCW Positive
   }
 
   // Makes System Identification Routine for Mathematical Analysis. Runs two tests that apply specific voltages to motors and log their positions and velocities.
   private void createSytemIdentificationRoutine() {
-    sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(Units.Volts.per(Units.Second).of(0.75), Units.Volts.of(5.25), Units.Seconds.of(5)),
+    sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(Units.Volts.per(Units.Second).of(0.75), Units.Volts.of(0.75), Units.Seconds.of(5)),
     new SysIdRoutine.Mechanism(
       (Measure<Voltage> volts) -> {
         for(SwerveModule module : swerveModules) {
           module.driveMotor.setVoltage(volts.in(Units.Volts));
+          //module.driveMotor.setControl(new VoltageOut(volts.in(Units.Volts)));
         }},
         
       log -> {

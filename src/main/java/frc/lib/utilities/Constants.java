@@ -92,7 +92,6 @@ public final class Constants {
   }
 
   public static final class SystemToggles {
-    public static boolean systemIdentification = false;
     public static final boolean useCompleteAuto = false;
   }
   
@@ -171,8 +170,8 @@ public final class Constants {
          /** Radians per Second */
          //public static final double maxAngularVelocity = 8.0; //TODO: This must be tuned to specific robot
 
-         public static double maxSpeed = Preferences.getDouble(Keys.maxSpeedKey, 4.3);
-         public static double maxAngularVelocity = Preferences.getDouble(Keys.maxAngularVelocityKey, 14.0);
+         public static double maxSpeed = Preferences.getDouble(Keys.maxSpeedKey, 4.17);
+         public static double maxAngularVelocity = Preferences.getDouble(Keys.maxAngularVelocityKey, 29.65);
 
          /* Neutral Modes */
          public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
@@ -270,6 +269,9 @@ public final class Constants {
       public static final String speakerLowAimV = "Speaker-Shot Lower-Aim Velocity";
       public static final String ampV = "Amplifier-Shot Velocity";
       public static final String launcherTolerance = "Launcher Tolerance";
+
+      public static final String characterizationKey = "System Characterization Mode";
+      public static final String compressorOnlyKey = "Compressor Only Mode";
 
 
      }

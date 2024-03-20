@@ -5,10 +5,13 @@
   "pathFolders": [
     "Test"
   ],
-  "autoFolders": [],
-  "defaultMaxVel": 4.3,
-  "defaultMaxAccel": 4.3,
+  "autoFolders": [
+    "Test",
+    "PreSecondComp"
+  ],
+  "defaultMaxVel": 3.5,
+  "defaultMaxAccel": 3.5,
   "defaultMaxAngVel": 802.0,
   "defaultMaxAngAccel": 802.0,
-  "maxModuleSpeed": 4.3
+  "maxModuleSpeed": 3.5
 }
