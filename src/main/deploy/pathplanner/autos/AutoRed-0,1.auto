@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 16.127725969737654,
+      "y": 3.8847563409412538
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red-toShoot0"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red-toNote1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "red-fromNote1"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
