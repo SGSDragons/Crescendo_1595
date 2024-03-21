@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.280698783619789,
+        "y": 4.115090452403127
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 11.66398555019332,
+        "y": 3.352806705613412
+      },
+      "isLocked": false,
+      "linkedName": "rend-6"
+    },
+    {
+      "anchor": {
+        "x": 14.399853244150933,
+        "y": 5.556120001128891
+      },
+      "prevControl": {
+        "x": 12.530691728050122,
+        "y": 5.650100189089267
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "rshot-center"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.5,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 802.0,
+    "maxAngularAcceleration": 802.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
