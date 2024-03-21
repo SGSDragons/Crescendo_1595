@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 14.326757542403973,
+        "x": 14.399853244150933,
         "y": 5.556120001128891
       },
       "prevControl": {
-        "x": 13.909067818135634,
-        "y": 5.577004487342309
+        "x": 13.982163519882594,
+        "y": 5.577004487342311
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "rshot-2"
+      "linkedName": "rshot-center"
     }
   ],
   "rotationTargets": [],
@@ -39,13 +39,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 40.0,
+    "rotation": -140.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

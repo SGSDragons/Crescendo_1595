@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 14.326757542403973,
+        "x": 14.399853244150933,
         "y": 5.556120001128891
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.911523156379644,
+        "x": 14.984618858126604,
         "y": 4.856489712979426
       },
       "isLocked": false,
-      "linkedName": "rshot-2"
+      "linkedName": "rshot-center"
     },
     {
       "anchor": {
@@ -39,13 +39,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true
