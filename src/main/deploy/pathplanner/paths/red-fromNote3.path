@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.5,
-        "y": 7.05119924525894
+        "x": 13.73154968532159,
+        "y": 4.115090452403127
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.013607170078599,
-        "y": 6.845966834789528
+        "x": 14.117912680269804,
+        "y": 4.344819800750713
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "rend-3"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 4.752067281912342
       },
       "prevControl": {
-        "x": 14.983820570813151,
-        "y": 4.884002402922434
+        "x": 14.264104083763723,
+        "y": 4.501453447351339
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,20 +32,20 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
-    "maxAcceleration": 3.5,
-    "maxAngularVelocity": 802.0,
-    "maxAngularAcceleration": 802.0
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -40.0,
+    "rotation": 24.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -45.151606209389975,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true
