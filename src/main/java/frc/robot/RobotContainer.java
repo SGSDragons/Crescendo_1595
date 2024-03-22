@@ -292,7 +292,7 @@ public class RobotContainer {
     Preferences.initBoolean(Keys.characterizationKey, false);
     Preferences.initBoolean(Keys.compressorOnlyKey, false);
 
-    Preferences.initDouble(Keys.correctNotePositionTimeKey, 0.9);
+    Preferences.initDouble(Keys.correctNotePositionTimeKey, 0.09);
     Preferences.initDouble(Keys.minimumNoteProximityKey, 500);
 
   }
