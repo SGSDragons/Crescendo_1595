@@ -66,8 +66,8 @@ public class TeleopDrive extends Command {
       LimelightTarget.Error targetLock = speakerTarget.find(0); // Heading is unused
       if (targetLock != null) {
         double xErr = MathUtil.applyDeadband(targetLock.x, 3);
-        if (Math.abs(xErr) > 10.0) {
-          xErr *= 10.0/xErr;
+        if (Math.abs(xErr) > 5.0) {
+          xErr *= 5.0/xErr;
         }
         if (xErr == 0.0) {
           rumble.accept(1.0);
