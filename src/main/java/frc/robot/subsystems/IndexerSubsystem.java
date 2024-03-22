@@ -65,7 +65,7 @@ public class IndexerSubsystem extends SubsystemBase{
 
         
         int noteProximity = noteDetector.getProximity();
-        if (noteProximity > 100) {
+        if (noteProximity > Preferences.getDouble(Keys.minimumNoteProximityKey, 500)) {
             LimelightHelpers.setLEDMode_ForceBlink("limelight");
             noteLoaded = true;
         }

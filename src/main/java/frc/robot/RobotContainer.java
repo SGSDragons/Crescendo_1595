@@ -300,6 +300,7 @@ public class RobotContainer {
     Preferences.initBoolean(Keys.compressorOnlyKey, false);
 
     Preferences.initDouble(Keys.correctNotePositionTimeKey, 0.9);
+    Preferences.initDouble(Keys.minimumNoteProximityKey, 500);
 
   }
 }
