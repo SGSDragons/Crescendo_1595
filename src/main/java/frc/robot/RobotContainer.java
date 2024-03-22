@@ -73,7 +73,7 @@ public class RobotContainer {
   private final JoystickButton indexerIntake = new JoystickButton(operator, XboxController.Button.kRightBumper.value);
   private final JoystickButton indexerOuttake = new JoystickButton(operator, XboxController.Button.kLeftBumper.value);
 
-  private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kX.value);
+  private final JoystickButton autoAim = new JoystickButton(driver, XboxController.Button.kA.value);
   
   private final JoystickButton compressor = new JoystickButton(driver, XboxController.Button.kX.value);
 
@@ -95,7 +95,8 @@ public class RobotContainer {
             () -> -driver.getRawAxis(translationAxis),
             () -> -driver.getRawAxis(strafeAxis),
             () -> -driver.getRawAxis(rotationAxis),
-            () -> robotCentric.getAsBoolean()
+            () -> robotCentric.getAsBoolean(),
+            () -> autoAim.getAsBoolean()
           )
       );
     }
@@ -160,15 +161,6 @@ public class RobotContainer {
     indexerIntake.onFalse(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.1)));
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
 
-    //correctNotePosition.onTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.1)));
-
-    //autoAim.whileTrue(new Aim(blueTargets().get(0), drivetrainSubsystem));
-    int speakerTag = isBlue() ? 7 : 4;
-    autoAim.whileTrue(new TwistAim(
-            new LimelightTarget(speakerTag, 0, 0, 0),
-            drivetrainSubsystem
-          ));
-
     climberUp.onTrue(new InstantCommand(() -> {
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.leftClimber);
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.rightClimber);
@@ -198,7 +190,7 @@ public class RobotContainer {
 
     for (int i=0; i < targets.size(); ++i) {
       // Play with tolerance until we are happy it gets close enough fast enough.
-      NamedCommands.registerCommand("aim-"+i, new Aim(targets.get(i), 0.5, drivetrainSubsystem));
+      NamedCommands.registerCommand("aim-"+i, new Aim(targets.get(i), 6, drivetrainSubsystem));
     }
   }
 
@@ -247,14 +239,14 @@ public class RobotContainer {
 
     targets.add(new LimelightTarget(
             4,
-            sgs.getEntry("aim_0_tx").getDouble(-12.0),
-            sgs.getEntry("aim_0_ty").getDouble(8.0),
-            sgs.getEntry("aim_0_heading").getDouble(0.0)));
+            sgs.getEntry("aim_0_tx").getDouble(0.0),
+            sgs.getEntry("aim_0_ty").getDouble(6.0),
+            sgs.getEntry("aim_0_heading").getDouble(150.0)));
     targets.add(new LimelightTarget(
             4,
             sgs.getEntry("aim_1_tx").getDouble(0.0),
             sgs.getEntry("aim_1_ty").getDouble(0.0),
-            sgs.getEntry("aim_1_heading").getDouble(-25.0)));
+            sgs.getEntry("aim_1_heading").getDouble(0.0)));
     targets.add(new LimelightTarget(
             4,
             sgs.getEntry("aim_2_tx").getDouble(0.0),
@@ -289,11 +281,11 @@ public class RobotContainer {
 
     //Intake, Index, Launch
     Preferences.initDouble(Keys.indexVoltKey, 6.0);
-    Preferences.initDouble(Keys.indexAmpVoltKey, 3.0);
+    Preferences.initDouble(Keys.indexAmpVoltKey, 1.5);
     Preferences.initDouble(Keys.intakeVoltKey, 3.0);
-    Preferences.initDouble(Keys.speakerHighAimV, 65);
+    Preferences.initDouble(Keys.speakerHighAimV, 80);
     Preferences.initDouble(Keys.speakerLowAimV, -80);
-    Preferences.initDouble(Keys.ampV, 10);
+    Preferences.initDouble(Keys.ampV, 40);
     Preferences.initDouble(Keys.launcherTolerance, 15);
 
     Preferences.initBoolean(Keys.characterizationKey, false);

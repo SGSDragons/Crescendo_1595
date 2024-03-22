@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -10,10 +11,12 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class TwistAim extends Command {
     public final LimelightTarget target;
+    public final double tolerance;
     public DrivetrainSubsystem drivetrainSubsystem;
 
-    public TwistAim(LimelightTarget target, DrivetrainSubsystem drivetrainSubsystem) {
+    public TwistAim(LimelightTarget target, double tolerance, DrivetrainSubsystem drivetrainSubsystem) {
         this.target = target;
+        this.tolerance = tolerance;
         this.drivetrainSubsystem = drivetrainSubsystem;
     }
 
@@ -35,7 +38,8 @@ public class TwistAim extends Command {
             return;
         }
 
-        double dTheta = error.x * Aim.headingGain.getDouble(0.0);
+        double x = MathUtil.applyDeadband(error.x, tolerance);
+        double dTheta = x * Aim.headingGain.getDouble(0.0);
 
         drivetrainSubsystem.drive(
                 new Translation2d(0, 0),
