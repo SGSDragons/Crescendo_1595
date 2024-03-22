@@ -4,7 +4,10 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.lib.utilities.Constants;
+import frc.lib.utilities.LimelightHelpers;
+import frc.lib.utilities.LimelightTarget;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 import java.util.function.BooleanSupplier;
@@ -20,10 +23,15 @@ public class TeleopDrive extends Command {
   private DoubleSupplier strafeSupplier;
   private DoubleSupplier rotationSupplier;
   private BooleanSupplier robotCentricSupplier;
+  private BooleanSupplier autoAim;
+  private LimelightTarget speakerTarget;
 
-  public TeleopDrive(DrivetrainSubsystem drivetrainSubsystem,
-  DoubleSupplier translaSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotationSupplier,
-  BooleanSupplier robotCentricSupplier)
+  public TeleopDrive(
+      DrivetrainSubsystem drivetrainSubsystem,
+      DoubleSupplier translaSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotationSupplier,
+      BooleanSupplier robotCentricSupplier,
+      BooleanSupplier autoAim
+    )
   {
     this.drivetrainSubsystem = drivetrainSubsystem;
     addRequirements(drivetrainSubsystem);
@@ -32,6 +40,10 @@ public class TeleopDrive extends Command {
     this.strafeSupplier = strafeSupplier;
     this.rotationSupplier = rotationSupplier;
     this.robotCentricSupplier = robotCentricSupplier;
+    this.autoAim = autoAim;
+
+    boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
+    this.speakerTarget = new LimelightTarget(isBlue ? 7 : 3, 0, 6.0, 0.0);
   }
 
   // Called when the command is initially scheduled.
@@ -44,6 +56,17 @@ public class TeleopDrive extends Command {
     double translationValue = MathUtil.applyDeadband(translationSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
     double strafeValue = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
     double rotationValue = MathUtil.applyDeadband(rotationSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
+
+    if (autoAim.getAsBoolean()) {
+      LimelightHelpers.setLEDMode_ForceOn("limelight");
+      LimelightTarget.Error targetLock = speakerTarget.find(0);
+      if (targetLock != null) {
+        double xErr = MathUtil.applyDeadband(targetLock.x, 6);
+        rotationValue += xErr * Aim.headingGain.getDouble(0.0);
+      }
+    } else {
+      LimelightHelpers.setLEDMode_ForceOff("limelight");
+    }
 
     drivetrainSubsystem.drive(
       new Translation2d(translationValue, strafeValue).times(Constants.SwerveConstants.maxSpeed),

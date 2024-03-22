@@ -95,7 +95,8 @@ public class RobotContainer {
             () -> -driver.getRawAxis(translationAxis),
             () -> -driver.getRawAxis(strafeAxis),
             () -> -driver.getRawAxis(rotationAxis),
-            () -> robotCentric.getAsBoolean()
+            () -> robotCentric.getAsBoolean(),
+            () -> autoAim.getAsBoolean()
           )
       );
     }
@@ -159,11 +160,6 @@ public class RobotContainer {
     indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_DISREGARD_LOADING));
     indexerIntake.onFalse(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.1)));
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
-
-    List<LimelightTarget> targets = isBlue() ? blueTargets() : redTargets();
-    int focus = (int)NetworkTableInstance.getDefault().getTable("sgs").getEntry("ll_target").getInteger(0);
-
-    autoAim.whileTrue(new Aim(targets.get(focus), 3, drivetrainSubsystem));
 
     climberUp.onTrue(new InstantCommand(() -> {
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.leftClimber);
