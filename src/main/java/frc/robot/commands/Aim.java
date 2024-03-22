@@ -1,10 +1,14 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.utilities.LimelightHelpers;
 import frc.lib.utilities.LimelightTarget;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
@@ -26,9 +30,9 @@ public class Aim extends Command {
 
         // These values will be used unless edited in NT's aim parameters
         // Find good values in testing, then hard code them here.
-        xGain.setDouble(0.0);
-        yGain.setDouble(0.0);
-        headingGain.setDouble(0.0);
+        xGain.setDouble(0.1);
+        yGain.setDouble(0.1);
+        headingGain.setDouble(-0.1);
     }
 
 
@@ -39,7 +43,9 @@ public class Aim extends Command {
     }
 
     /** The initial subroutine of a command. Called once when the command is initially scheduled. */
-    public void initialize() {}
+    public void initialize() {
+        LimelightHelpers.setLEDMode_ForceOn("limelight");
+    }
 
     /** The main body of a command. Called repeatedly while the command is scheduled. */
     public void execute() {
@@ -56,9 +62,12 @@ public class Aim extends Command {
             return;
         }
 
-        double strafeValue = error.x * xGain.getDouble(0.0);
-        double translationValue = error.y * yGain.getDouble(0.0);
-        double dTheta = error.heading * headingGain.getDouble(0.0);
+        double x = MathUtil.applyDeadband(error.x, tolerance);
+        double y = MathUtil.applyDeadband(error.y, tolerance);
+        double heading = MathUtil.applyDeadband(error.heading, tolerance);
+        double strafeValue = x * xGain.getDouble(0.0);
+        double translationValue = y * yGain.getDouble(0.0);
+        double dTheta = heading * headingGain.getDouble(0.0);
 
         drivetrainSubsystem.drive(
                 new Translation2d(translationValue, strafeValue),
@@ -78,7 +87,11 @@ public class Aim extends Command {
      */
     public void end(boolean interrupted) {
         // turns off all motors?
+        LimelightHelpers.setLEDMode_ForceOff("limelight");
+        ChassisSpeeds stop = new ChassisSpeeds(0, 0, 0);
+        drivetrainSubsystem.drive(stop);
     }
+
 
     /**
      * Whether the command has finished. Once a command finishes, the scheduler will call its end()
@@ -94,10 +107,19 @@ public class Aim extends Command {
         if (error == null) {
             misses += 1;
             // Give up if there are more than 20 checks and the tag isn't found.
-            return misses > 20;
+            boolean fail = misses > 100;
+            if (fail) {
+                DriverStation.reportWarning("Aim Giving up", false);
+            }
+            return fail;
         }
 
+
         misses = 0;
-        return Math.abs(error.x) < tolerance && Math.abs(error.y) < tolerance && error.heading == 3;
+        boolean locked = Math.abs(error.x) < tolerance && Math.abs(error.y) < tolerance && Math.abs(error.heading) < 3;
+        if (locked) {
+            DriverStation.reportWarning("Aim Complete", false);
+        }
+        return locked;
     }
 }
