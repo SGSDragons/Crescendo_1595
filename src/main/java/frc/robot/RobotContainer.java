@@ -8,7 +8,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.*;
 
 import frc.lib.utilities.LimelightTarget;
 import frc.robot.commands.*;
@@ -96,7 +96,11 @@ public class RobotContainer {
             () -> -driver.getRawAxis(strafeAxis),
             () -> -driver.getRawAxis(rotationAxis),
             () -> robotCentric.getAsBoolean(),
-            () -> autoAim.getAsBoolean()
+            () -> autoAim.getAsBoolean(),
+            (intensity) -> {
+              driver.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
+              operator.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
+            }
           )
       );
     }
@@ -141,7 +145,11 @@ public class RobotContainer {
           () -> -driver.getRawAxis(strafeAxis),
           () -> -driver.getRawAxis(rotationAxis) * 0.25,
           () -> robotCentric.getAsBoolean(),
-          () -> autoAim.getAsBoolean()
+          () -> autoAim.getAsBoolean(),
+          (intensity) -> {
+            driver.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
+            operator.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
+          }
         ));
 
     //Launches Notes (Automatic launches after spinup, Manual only launches after spinup and button release)
