@@ -43,7 +43,7 @@ public class TeleopDrive extends Command {
     this.autoAim = autoAim;
 
     boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
-    this.speakerTarget = new LimelightTarget(isBlue ? 7 : 3, 0, 6.0, 0.0);
+    this.speakerTarget = new LimelightTarget(isBlue ? 7 : 4, 0, 6.0, 0.0);
   }
 
   // Called when the command is initially scheduled.
@@ -61,7 +61,7 @@ public class TeleopDrive extends Command {
       LimelightHelpers.setLEDMode_ForceOn("limelight");
       LimelightTarget.Error targetLock = speakerTarget.find(0);
       if (targetLock != null) {
-        double xErr = MathUtil.applyDeadband(targetLock.x, 6);
+        double xErr = MathUtil.applyDeadband(targetLock.x, 3);
         rotationValue += xErr * Aim.headingGain.getDouble(0.0);
       }
     } else {

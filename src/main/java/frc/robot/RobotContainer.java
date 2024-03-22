@@ -140,7 +140,8 @@ public class RobotContainer {
           () -> -driver.getRawAxis(translationAxis),
           () -> -driver.getRawAxis(strafeAxis),
           () -> -driver.getRawAxis(rotationAxis) * 0.25,
-          () -> robotCentric.getAsBoolean()
+          () -> robotCentric.getAsBoolean(),
+          () -> autoAim.getAsBoolean()
         ));
 
     //Launches Notes (Automatic launches after spinup, Manual only launches after spinup and button release)
