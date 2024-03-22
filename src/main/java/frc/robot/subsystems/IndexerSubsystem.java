@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -63,13 +64,12 @@ public class IndexerSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
 
-        
         int noteProximity = noteDetector.getProximity();
         if (noteProximity > 100) {
             LimelightHelpers.setLEDMode_ForceBlink("limelight");
             noteLoaded = true;
         }
-        else {
+        else if (DriverStation.isTeleop()){
             LimelightHelpers.setLEDMode_ForceOff("limelight");
         }
         

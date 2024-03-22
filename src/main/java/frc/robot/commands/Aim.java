@@ -32,7 +32,7 @@ public class Aim extends Command {
         // Find good values in testing, then hard code them here.
         xGain.setDouble(0.1);
         yGain.setDouble(0.1);
-        headingGain.setDouble(-0.1);
+        headingGain.setDouble(0.015);
     }
 
 
