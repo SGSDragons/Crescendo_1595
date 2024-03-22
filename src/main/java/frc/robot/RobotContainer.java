@@ -24,6 +24,9 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import frc.lib.utilities.Constants.Keys;
 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -123,7 +126,7 @@ public class RobotContainer {
       driveQuasiBackward.whileTrue(drivetrainSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
       driveDynamicForward.whileTrue(drivetrainSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
       driveDynamicBackward.whileTrue(drivetrainSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
+      
       //No Other Keybinds will Load in System Identification Mode, for no other keybinds will be assigned to actions.
       return;
     }
@@ -297,6 +300,8 @@ public class RobotContainer {
     Preferences.initBoolean(Keys.characterizationKey, false);
     Preferences.initBoolean(Keys.compressorOnlyKey, false);
 
+    Preferences.initDouble(Keys.correctNotePositionTimeKey, 0.9);
+    Preferences.initDouble(Keys.minimumNoteProximityKey, 500);
 
   }
 }

@@ -47,7 +47,7 @@ public class TeleopDrive extends Command {
     this.rumble = rumble;
 
     boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
-    this.speakerTarget = new LimelightTarget(isBlue ? 7 : 3, 0, 6.0, 0.0);
+    this.speakerTarget = new LimelightTarget(isBlue ? 7 : 4, 0, 6.0, 0.0);
   }
 
   // Called when the command is initially scheduled.
