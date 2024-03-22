@@ -273,6 +273,7 @@ public final class Constants {
       public static final String characterizationKey = "System Characterization Mode";
       public static final String compressorOnlyKey = "Compressor Only Mode";
 
+      public static final String correctNotePositionTimeKey = "Note Correction Outtake Seconds";
 
      }
 }

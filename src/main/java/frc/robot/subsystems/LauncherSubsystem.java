@@ -49,7 +49,8 @@ public class LauncherSubsystem extends SubsystemBase{
         config.kI = TuningValues.launcherkI;
         config.kD = TuningValues.launcherkD;
         
-        upperSpinnerTargetV = ampShot ? Preferences.getDouble(Keys.ampV, 40) : Preferences.getDouble(Keys.speakerHighAimV, 80);
+        upperSpinnerTargetV = ampShot ? Preferences.getDouble(Keys.ampV, 40) : Preferences.getDouble(Keys.speakerHighAimV, 65);
+        
 
         topSpinner.getConfigurator().apply(config);
         middleSpinner.getConfigurator().apply(config);
@@ -86,8 +87,8 @@ public class LauncherSubsystem extends SubsystemBase{
         double upperMaxVelocity;
 
         if (direction == LaunchDirection.AMP) {
-            lowerMaxVelocity = -Preferences.getDouble(Keys.ampV, 40);
-            upperMaxVelocity = Preferences.getDouble(Keys.ampV, 40);
+            lowerMaxVelocity = -Preferences.getDouble(Keys.ampV, 10);
+            upperMaxVelocity = Preferences.getDouble(Keys.ampV, 10);
         }
         else {
             lowerMaxVelocity = Preferences.getDouble(Keys.speakerLowAimV, -80);
@@ -98,7 +99,7 @@ public class LauncherSubsystem extends SubsystemBase{
         double topSpinnerVelocity = topSpinner.getVelocity().getValueAsDouble();
         double middleSpinnerVelocity = middleSpinner.getVelocity().getValueAsDouble();
 
-        double tolerance = Preferences.getDouble(Keys.launcherTolerance, 15);
+        double tolerance = Preferences.getDouble(Keys.launcherTolerance, 5);
 
         if ((bottomSpinnerVelocity < lowerMaxVelocity + tolerance) || (topSpinnerVelocity > upperMaxVelocity - tolerance)) {
           if ((middleSpinnerVelocity < lowerMaxVelocity + tolerance) || (middleSpinnerVelocity > upperMaxVelocity - tolerance)) {

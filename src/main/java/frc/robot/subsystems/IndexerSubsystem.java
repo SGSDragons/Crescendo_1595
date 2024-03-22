@@ -52,7 +52,7 @@ public class IndexerSubsystem extends SubsystemBase{
     }
 
     public void indexNoteLaunchSpeaker(boolean ampShot) {
-        double voltage = ampShot ? Preferences.getDouble(Keys.indexAmpVoltKey, 1.5) : Preferences.getDouble(Keys.indexVoltKey, 6.0);
+        double voltage = ampShot ? Preferences.getDouble(Keys.indexAmpVoltKey, 3.0) : Preferences.getDouble(Keys.indexVoltKey, 6.0);
         indexerMotor.setVoltage(voltage);
     }
 

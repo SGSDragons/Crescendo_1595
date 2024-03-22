@@ -77,6 +77,8 @@ public class RobotContainer {
   
   private final JoystickButton compressor = new JoystickButton(driver, XboxController.Button.kX.value);
 
+  private final POVButton correctNotePosition = new POVButton(operator, 180);
+
   private SendableChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -154,8 +156,11 @@ public class RobotContainer {
     launchAmpManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.00));
     
 
-    indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_DISREGARD_LOADING)); //Does not check for if note is loaded
+    indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_DISREGARD_LOADING));
+    indexerIntake.onFalse(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.1)));
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
+
+    //correctNotePosition.onTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.1)));
 
     //autoAim.whileTrue(new Aim(blueTargets().get(0), drivetrainSubsystem));
     int speakerTag = isBlue() ? 7 : 4;
@@ -284,16 +289,17 @@ public class RobotContainer {
 
     //Intake, Index, Launch
     Preferences.initDouble(Keys.indexVoltKey, 6.0);
-    Preferences.initDouble(Keys.indexAmpVoltKey, 1.5);
+    Preferences.initDouble(Keys.indexAmpVoltKey, 3.0);
     Preferences.initDouble(Keys.intakeVoltKey, 3.0);
-    Preferences.initDouble(Keys.speakerHighAimV, 80);
+    Preferences.initDouble(Keys.speakerHighAimV, 65);
     Preferences.initDouble(Keys.speakerLowAimV, -80);
-    Preferences.initDouble(Keys.ampV, 40);
+    Preferences.initDouble(Keys.ampV, 10);
     Preferences.initDouble(Keys.launcherTolerance, 15);
 
     Preferences.initBoolean(Keys.characterizationKey, false);
     Preferences.initBoolean(Keys.compressorOnlyKey, false);
 
+    Preferences.initDouble(Keys.correctNotePositionTimeKey, 0.9);
 
   }
 }
