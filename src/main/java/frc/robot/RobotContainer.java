@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.utilities.Constants.OperatorConstants;
 import frc.lib.utilities.Constants.SystemToggles;
@@ -77,7 +76,7 @@ public class RobotContainer {
   
   private final JoystickButton compressor = new JoystickButton(driver, XboxController.Button.kX.value);
 
-  private final POVButton correctNotePosition = new POVButton(operator, 180);
+  //private final POVButton correctNotePosition = new POVButton(operator, 180);
 
   private SendableChooser<Command> autoChooser;
 
@@ -192,7 +191,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("IntakeLong",
       new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(7.7).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
 
-    NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
+    //NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
 
     boolean isBlue = isBlue();
     List<LimelightTarget> targets = isBlue ? blueTargets() : redTargets();
@@ -290,12 +289,12 @@ public class RobotContainer {
 
     //Intake, Index, Launch
     Preferences.initDouble(Keys.indexVoltKey, 6.0);
-    Preferences.initDouble(Keys.indexAmpVoltKey, 1.5);
+    Preferences.initDouble(Keys.indexAmpVoltKey, 3.0);
     Preferences.initDouble(Keys.intakeVoltKey, 3.0);
-    Preferences.initDouble(Keys.speakerHighAimV, 80);
+    Preferences.initDouble(Keys.speakerHighAimV, 65);
     Preferences.initDouble(Keys.speakerLowAimV, -80);
-    Preferences.initDouble(Keys.ampV, 40);
-    Preferences.initDouble(Keys.launcherTolerance, 15);
+    Preferences.initDouble(Keys.ampV, 10);
+    Preferences.initDouble(Keys.launcherTolerance, 5);
 
     Preferences.initBoolean(Keys.characterizationKey, false);
     Preferences.initBoolean(Keys.compressorOnlyKey, false);
