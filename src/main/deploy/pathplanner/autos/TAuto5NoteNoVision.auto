@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.39643617748774124,
-      "y": 7.15
+      "x": 0.04122623629862797,
+      "y": 7.0
     },
     "rotation": 0
   },
@@ -14,19 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "bpath-0"
+            "pathName": "blue-toShoot0"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "LaunchNoteLow"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
           }
         },
         {
@@ -132,6 +126,6 @@
       ]
     }
   },
-  "folder": "PreSecondComp",
+  "folder": "SecondComp",
   "choreoAuto": false
 }

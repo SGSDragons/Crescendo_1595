@@ -3,14 +3,17 @@
   "robotLength": 0.69,
   "holonomicMode": true,
   "pathFolders": [
+    "Amplifier",
     "Test"
   ],
   "autoFolders": [
+    "PreSecondComp",
+    "SecondComp",
     "Test",
-    "PreSecondComp"
+    "Vision"
   ],
-  "defaultMaxVel": 3.5,
-  "defaultMaxAccel": 3.5,
+  "defaultMaxVel": 4.3,
+  "defaultMaxAccel": 8.6,
   "defaultMaxAngVel": 802.0,
   "defaultMaxAngAccel": 802.0,
   "maxModuleSpeed": 3.5

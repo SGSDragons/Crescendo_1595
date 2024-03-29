@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 0.09056095035267145,
+      "y": 6.946327738809324
+    },
+    "rotation": 0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,13 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "rpath-0"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "aim-0"
+            "pathName": "bpath-0"
           }
         },
         {
@@ -26,7 +26,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.25
           }
         },
         {
@@ -34,15 +34,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "rpath-1"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "t path 0"
                 }
               }
             ]
@@ -51,7 +51,26 @@
         {
           "type": "named",
           "data": {
-            "name": "aim-1"
+            "name": "LaunchNoteLow"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "tpath 1"
+                }
+              }
+            ]
           }
         },
         {
@@ -61,25 +80,19 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "rpath-2"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "tpath 2"
                 }
               }
             ]
@@ -94,6 +107,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "SecondComp",
   "choreoAuto": false
 }

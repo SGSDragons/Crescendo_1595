@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.3762529063519677,
-        "y": 7.114065766593072
+        "x": 3.534123991324907,
+        "y": 7.271936851566012
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4785526603613426,
-        "y": 7.2237688218359475
+        "x": 3.636423745334282,
+        "y": 7.381639906808887
       },
       "isLocked": false,
       "linkedName": "bshot-1"
@@ -32,8 +32,8 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
-    "maxAcceleration": 3.5,
+    "maxVelocity": 4.3,
+    "maxAcceleration": 8.6,
     "maxAngularVelocity": 802.0,
     "maxAngularAcceleration": 802.0
   },

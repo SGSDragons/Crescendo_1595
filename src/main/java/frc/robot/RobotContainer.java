@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RobotContainer {
-  private static boolean compressorOnly;
+  private static boolean compressorOnly = false;
 
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
@@ -85,7 +85,7 @@ public class RobotContainer {
     initializeRobotPreferences();
     registerNamedCommands();
 
-    compressorOnly = Preferences.getBoolean(Keys.compressorOnlyKey, false);
+    //compressorOnly = Preferences.getBoolean(Keys.compressorOnlyKey, false);
 
     if (!compressorOnly) {
       drivetrainSubsystem.setDefaultCommand(
@@ -182,14 +182,14 @@ public class RobotContainer {
   }
   
   private void registerNamedCommands() {
-    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(1.5));
+    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(1));
     NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true).withTimeout(1.5));
-    NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.5));
+    NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.0));
     NamedCommands.registerCommand("Intake",
-      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(2.0).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
+      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(2.0).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.09)))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
 
     NamedCommands.registerCommand("IntakeLong",
-      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(7.7).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(0.1))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
+      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(7.7).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.09)))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
 
     //NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
 
@@ -254,12 +254,12 @@ public class RobotContainer {
             4,
             sgs.getEntry("aim_1_tx").getDouble(0.0),
             sgs.getEntry("aim_1_ty").getDouble(0.0),
-            sgs.getEntry("aim_1_heading").getDouble(0.0)));
+            sgs.getEntry("aim_1_heading").getDouble(160.0)));
     targets.add(new LimelightTarget(
             4,
             sgs.getEntry("aim_2_tx").getDouble(0.0),
             sgs.getEntry("aim_2_ty").getDouble(0.0),
-            sgs.getEntry("aim_2_heading").getDouble(0.0)));
+            sgs.getEntry("aim_2_heading").getDouble(180.0)));
 
     return targets;
   }
@@ -290,7 +290,7 @@ public class RobotContainer {
     //Intake, Index, Launch
     Preferences.initDouble(Keys.indexVoltKey, 6.0);
     Preferences.initDouble(Keys.indexAmpVoltKey, 3.0);
-    Preferences.initDouble(Keys.intakeVoltKey, 3.0);
+    Preferences.initDouble(Keys.intakeVoltKey, 4.5);
     Preferences.initDouble(Keys.speakerHighAimV, 65);
     Preferences.initDouble(Keys.speakerLowAimV, -80);
     Preferences.initDouble(Keys.ampV, 10);
@@ -299,7 +299,7 @@ public class RobotContainer {
     Preferences.initBoolean(Keys.characterizationKey, false);
     Preferences.initBoolean(Keys.compressorOnlyKey, false);
 
-    Preferences.initDouble(Keys.correctNotePositionTimeKey, 0.09);
+    Preferences.initDouble(Keys.correctNotePositionTimeKey, 0.11);
     Preferences.initDouble(Keys.minimumNoteProximityKey, 500);
 
   }

@@ -23,7 +23,7 @@ public class IndexerSubsystem extends SubsystemBase{
 
     public IndexerSubsystem() {
         indexerMotor = new TalonFX(HardwareID.indexerMotorCANId);
-        intakeMotor = new TalonFX(HardwareID.indexerMotor2CANId);
+        intakeMotor = new TalonFX(HardwareID.intakeMotorCANId);
         intakeMotor.setControl(new Follower(HardwareID.indexerMotorCANId, true));
         
         indexerMotor.setNeutralMode(NeutralModeValue.Brake);

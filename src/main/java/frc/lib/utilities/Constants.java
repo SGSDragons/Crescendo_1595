@@ -77,7 +77,7 @@ public final class Constants {
     public static final int rightNoteAimerReverseChannel = 3;
 
     public static final int indexerMotorCANId = 18;
-    public static final int indexerMotor2CANId = 15;
+    public static final int intakeMotorCANId = 15;
     public static final int bottomSpinnerMotorCANId = 19;
     public static final int middleSpinnerMotorCANId = 17;
     public static final int topSpinnerMotorCANId = 16;
