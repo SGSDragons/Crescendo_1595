@@ -30,7 +30,7 @@ public class TeleopDrive extends Command {
 
   public TeleopDrive(
       DrivetrainSubsystem drivetrainSubsystem,
-      DoubleSupplier translaSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotationSupplier,
+      DoubleSupplier translationSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotationSupplier,
       BooleanSupplier robotCentricSupplier,
       BooleanSupplier autoAim,
       DoubleConsumer rumble
@@ -39,7 +39,7 @@ public class TeleopDrive extends Command {
     this.drivetrainSubsystem = drivetrainSubsystem;
     addRequirements(drivetrainSubsystem);
 
-    this.translationSupplier = translaSupplier;
+    this.translationSupplier = translationSupplier;
     this.strafeSupplier = strafeSupplier;
     this.rotationSupplier = rotationSupplier;
     this.robotCentricSupplier = robotCentricSupplier;
@@ -50,11 +50,6 @@ public class TeleopDrive extends Command {
     this.speakerTarget = new LimelightTarget(isBlue ? 7 : 4, 0, 6.0, 0.0);
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     double translationValue = MathUtil.applyDeadband(translationSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
@@ -85,15 +80,5 @@ public class TeleopDrive extends Command {
       rotationValue * Constants.SwerveConstants.maxAngularVelocity,
       !robotCentricSupplier.getAsBoolean(),
       true);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
   }
 }

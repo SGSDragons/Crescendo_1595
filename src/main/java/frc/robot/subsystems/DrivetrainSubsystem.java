@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -48,6 +49,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private final MutableMeasure<Velocity<Distance>> velocity = MutableMeasure.mutable(Units.MetersPerSecond.of(0));
 
   private SysIdRoutine sysIdRoutine;
+  private VoltageOut swerveModuleVoltageOutput = new VoltageOut(0.0);
 
   public DrivetrainSubsystem() {
     //Initializes Gyroscope (Measures Yaw/Rotation Angle), swerve modules, and swerve odometry.
@@ -189,7 +191,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
           }     
     SmartDashboard.putNumber("Heading", getHeading().getDegrees());
     SmartDashboard.putNumber("MaximumSpeed", highestMeasuredVelocity);
-    SmartDashboard.putNumber("NavX", -navx.getAngle()); //CCW Positive
   }
 
   // Makes System Identification Routine for Mathematical Analysis. Runs two tests that apply specific voltages to motors and log their positions and velocities.
@@ -198,8 +199,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     new SysIdRoutine.Mechanism(
       (Measure<Voltage> volts) -> {
         for(SwerveModule module : swerveModules) {
-          module.driveMotor.setVoltage(volts.in(Units.Volts));
-          //module.driveMotor.setControl(new VoltageOut(volts.in(Units.Volts)));
+          module.driveMotor.setControl(swerveModuleVoltageOutput.withOutput(volts.in(Units.Volts)));
         }},
         
       log -> {
@@ -226,9 +226,5 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void periodic() {
     swerveDriveOdometry.update(getGyroYaw(), getModulePositions());
     telemetry();
-  }
-
-  @Override
-  public void simulationPeriodic() {
   }
 }

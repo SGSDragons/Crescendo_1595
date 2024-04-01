@@ -83,7 +83,6 @@ public class PneumaticsSubsystem extends SubsystemBase{
         compressor.disable();
     }
 
-    //Not reccommended to use unless necessary, compressor should always be enabled if one intends to use pneumatics.
     public void toggleCompressor() {
         if (compressor.isEnabled()) {
             compressor.disable();
@@ -92,19 +91,7 @@ public class PneumaticsSubsystem extends SubsystemBase{
         compressor.enableDigital();
     }
     
-    public boolean isForwardShorted() {
-        if (leftClimber.isFwdSolenoidDisabled() || rightClimber.isFwdSolenoidDisabled() || noteAimerLeft.isFwdSolenoidDisabled() || noteAimerRight.isFwdSolenoidDisabled()) {
-            return true;
-        }
-        return false;
-    }
-    
-    public boolean isReverseShorted() {
-        if (leftClimber.isRevSolenoidDisabled() || rightClimber.isRevSolenoidDisabled() || noteAimerLeft.isRevSolenoidDisabled() || noteAimerRight.isRevSolenoidDisabled()) {
-            return true;
-        }
-        return false;
-    }
+
     
     private void telemetry() {
         SmartDashboard.putBoolean("Compressor Enabled", compressor.isEnabled());
@@ -112,14 +99,6 @@ public class PneumaticsSubsystem extends SubsystemBase{
     
     @Override
     public void periodic() {
-        //Turns pneumatics off if an electical short occurs in either the forward or reverse solenoids.
-        /* 
-        if (isForwardShorted() || isReverseShorted()) {
-            turnAllSolenoidsOff();
-            compressor.disable();
-        }
-        
-         */
         telemetry();
     }
 }

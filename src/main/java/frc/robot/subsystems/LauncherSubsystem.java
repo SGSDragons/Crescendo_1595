@@ -20,9 +20,9 @@ public class LauncherSubsystem extends SubsystemBase{
 
     TalonFX bottomSpinner, middleSpinner, topSpinner;
 
-    private double upperSpinnerTargetV, lowerSpinnerTargetV;
+    private double topSpinnerTargetV, bottomSpinnerTargetV, middleSpinnerTargetV;
 
-    VelocityVoltage upperSpinnerVelocity, middleSpinnerVelocity, bottomSpinnerVelocity;
+    VelocityVoltage topSpinnerVelocity, middleSpinnerVelocity, bottomSpinnerVelocity;
 
     public BooleanSupplier isLauncherSpinning = () -> false;
 
@@ -36,44 +36,46 @@ public class LauncherSubsystem extends SubsystemBase{
         middleSpinner.setNeutralMode(NeutralModeValue.Coast);
         topSpinner.setNeutralMode(NeutralModeValue.Coast);
 
-        upperSpinnerVelocity = new VelocityVoltage(0);
+        topSpinnerVelocity = new VelocityVoltage(0);
         middleSpinnerVelocity = new VelocityVoltage(0);
         bottomSpinnerVelocity = new VelocityVoltage(0);
-    }
 
-    public void spinUpperSpinners(boolean ampShot) {
-        
         var config = new Slot0Configs();
         config.kV = TuningValues.launcherkV;
         config.kP = TuningValues.launcherkP;
         config.kI = TuningValues.launcherkI;
         config.kD = TuningValues.launcherkD;
-        
-        upperSpinnerTargetV = ampShot ? Preferences.getDouble(Keys.ampV, 40) : Preferences.getDouble(Keys.speakerHighAimV, 65);
-        
 
         topSpinner.getConfigurator().apply(config);
         middleSpinner.getConfigurator().apply(config);
-
-        topSpinner.setControl(upperSpinnerVelocity.withVelocity(upperSpinnerTargetV));
-        middleSpinner.setControl(middleSpinnerVelocity.withVelocity(upperSpinnerTargetV));
-    }
-
-    public void spinLowerSpinners() {
-        
-        var config = new Slot0Configs();
-        config.kV = TuningValues.launcherkV;
-        config.kP = TuningValues.launcherkP;
-        config.kI = TuningValues.launcherkI;
-        config.kD = TuningValues.launcherkD;
-
-        lowerSpinnerTargetV =  Preferences.getDouble(Keys.speakerLowAimV, -80);
-
-        middleSpinner.getConfigurator().apply(config);
         bottomSpinner.getConfigurator().apply(config);
 
-        middleSpinner.setControl(middleSpinnerVelocity.withVelocity(lowerSpinnerTargetV));
-        bottomSpinner.setControl(bottomSpinnerVelocity.withVelocity(lowerSpinnerTargetV));
+    }
+
+    public void spinTopFlywheel(LaunchDirection direction) {
+        topSpinnerTargetV = direction == LaunchDirection.AMP ? Preferences.getDouble(Keys.ampUpperV, 9.5) : Preferences.getDouble(Keys.speakerHighAimV, 65);
+        
+
+        topSpinner.setControl(topSpinnerVelocity.withVelocity(topSpinnerTargetV));
+    }
+
+    public void spinMiddleFlywheel(LaunchDirection direction) {
+        if (direction != LaunchDirection.LOW) {
+            middleSpinnerTargetV = direction == LaunchDirection.AMP ? Preferences.getDouble(Keys.ampMiddleV, 9.3) : Preferences.getDouble(Keys.speakerHighAimV, 65);
+        }
+
+        else {
+            middleSpinnerTargetV = Preferences.getDouble(Keys.speakerLowAimV, -80);
+        }
+        middleSpinner.setControl(middleSpinnerVelocity.withVelocity(middleSpinnerTargetV));
+    }
+
+
+    public void spinBottomFlywheel() {
+
+        bottomSpinnerTargetV =  Preferences.getDouble(Keys.speakerLowAimV, -80);
+
+        bottomSpinner.setControl(bottomSpinnerVelocity.withVelocity(bottomSpinnerTargetV));
     }
 
     public void stopSpinners() {
@@ -83,17 +85,27 @@ public class LauncherSubsystem extends SubsystemBase{
     }
 
     public boolean isLauncherUpToSpeed(LaunchDirection direction) {
-        double lowerMaxVelocity;
-        double upperMaxVelocity;
+        double bottomMaxVelocity;
+        double topMaxVelocity;
+        double middleMaxVelocity;
 
-        if (direction == LaunchDirection.AMP) {
-            lowerMaxVelocity = -Preferences.getDouble(Keys.ampV, 10);
-            upperMaxVelocity = Preferences.getDouble(Keys.ampV, 10);
+        switch (direction) {
+            case AMP:
+                middleMaxVelocity = Preferences.getDouble(Keys.ampMiddleV, 8.5);
+                topMaxVelocity = Preferences.getDouble(Keys.ampUpperV, 5.0);
+                break;
+            
+            case HIGH:
+                middleMaxVelocity = Preferences.getDouble(Keys.speakerHighAimV, 65);
+                topMaxVelocity = Preferences.getDouble(Keys.speakerHighAimV, 65);
+                break;
+
+            default:
+                middleMaxVelocity = Preferences.getDouble(Keys.speakerLowAimV, -80);
+                topMaxVelocity = Preferences.getDouble(Keys.speakerHighAimV, 65);
+                break;
         }
-        else {
-            lowerMaxVelocity = Preferences.getDouble(Keys.speakerLowAimV, -80);
-            upperMaxVelocity = Preferences.getDouble(Keys.speakerHighAimV, 80);
-        }
+        bottomMaxVelocity = Preferences.getDouble(Keys.speakerLowAimV, -80);
 
         double bottomSpinnerVelocity = bottomSpinner.getVelocity().getValueAsDouble();
         double topSpinnerVelocity = topSpinner.getVelocity().getValueAsDouble();
@@ -101,14 +113,12 @@ public class LauncherSubsystem extends SubsystemBase{
 
         double tolerance = Preferences.getDouble(Keys.launcherTolerance, 5);
 
-        if ((bottomSpinnerVelocity < lowerMaxVelocity + tolerance) || (topSpinnerVelocity > upperMaxVelocity - tolerance)) {
-          if ((middleSpinnerVelocity < lowerMaxVelocity + tolerance) || (middleSpinnerVelocity > upperMaxVelocity - tolerance)) {
+        if ((Math.abs(bottomSpinnerVelocity) > Math.abs(bottomMaxVelocity) - tolerance) || (Math.abs(topSpinnerVelocity) > Math.abs(topMaxVelocity) - tolerance)) {
+          if (Math.abs(middleSpinnerVelocity) > Math.abs(middleMaxVelocity)) {
             return true;
           }
         }
- 
         return false;
- 
     }
 
     @Override

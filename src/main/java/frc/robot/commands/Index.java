@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.lib.utilities.LimelightHelpers;
 import frc.robot.subsystems.IndexerSubsystem;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,7 +14,6 @@ public class Index extends Command {
   public enum IndexDirection {
     INTAKE,
     OUTTAKE,
-    INTAKE_DISREGARD_LOADING // Intakes without stopping when note is loaded.
   }
 
   private final IndexerSubsystem indexerSubsystem;
@@ -26,38 +26,46 @@ public class Index extends Command {
     this.direction = direction;
   }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-
+  @Override //Test if on Initialization is better overall:
+  public void initialize() {
     switch (direction) {
       case INTAKE:
-        indexerSubsystem.indexNoteIntake();
+        indexerSubsystem.intakeNote();
         break;
       case OUTTAKE:
-        indexerSubsystem.indexNoteOuttake();
+        indexerSubsystem.outtakeNote();
         break;
-      case INTAKE_DISREGARD_LOADING:
-        indexerSubsystem.indexNoteIntakeDisregardLoading();
+      default:
         break;
-      default: break;
     }
   }
 
-  // Called once the command ends or is interrupted.
+
   @Override
-  public void end(boolean interrupted) {
-    indexerSubsystem.stopIndexer();
+  public void execute() {
+
+    if (indexerSubsystem.isNoteLoaded()) {
+      LimelightHelpers.setLEDMode_ForceOn("limelight");
+    }
+
+/*
+ switch (direction) {
+   case INTAKE:
+     indexerSubsystem.intakeNote();
+     break;
+   case OUTTAKE:
+     indexerSubsystem.outtakeNote();
+     break;
+   default: break;
+ }
+ */
   }
 
-  // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
-    return false;
+  public void end(boolean interrupted) {
+      indexerSubsystem.stopIndexer();
+      LimelightHelpers.setLEDMode_ForceOff("limelight");
   }
 }
 

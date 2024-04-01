@@ -7,6 +7,7 @@ package frc.robot.commands;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.PneumaticsSubsystem;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class Launch extends Command {
@@ -22,8 +23,10 @@ public class Launch extends Command {
   private final PneumaticsSubsystem pneumaticsSubsystem;
   private final LaunchDirection direction;
   private final boolean automatic;
+  private final Joystick controller;
+  private boolean launchButtonPressed = false;
 
-  public Launch(LauncherSubsystem launcherSubsystem, IndexerSubsystem indexerSubsystem, PneumaticsSubsystem pneumaticsSubsystem, LaunchDirection direction, boolean automatic) {
+  public Launch(LauncherSubsystem launcherSubsystem, IndexerSubsystem indexerSubsystem, PneumaticsSubsystem pneumaticsSubsystem, LaunchDirection direction, boolean automatic, Joystick controller) {
     this.pneumaticsSubsystem = pneumaticsSubsystem;
     this.launcherSubsystem = launcherSubsystem;
     this.indexerSubsystem = indexerSubsystem;
@@ -31,56 +34,79 @@ public class Launch extends Command {
 
     this.direction = direction;
     this.automatic = automatic;
+    this.controller = controller;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    switch (direction) {
+  public void initialize() {
+     switch (direction) {
       case LOW:
-        launcherSubsystem.spinLowerSpinners();
+        launcherSubsystem.spinMiddleFlywheel(direction);
+        launcherSubsystem.spinBottomFlywheel();
         break;
       case HIGH:
         pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerRight);
         pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerLeft);
-        launcherSubsystem.spinUpperSpinners(false);
+        launcherSubsystem.spinTopFlywheel(direction);
+        launcherSubsystem.spinMiddleFlywheel(direction);
         break;
       case AMP:
         pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerRight);
         pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerLeft);
-        launcherSubsystem.spinUpperSpinners(true);
+        launcherSubsystem.spinTopFlywheel(direction);
+        launcherSubsystem.spinMiddleFlywheel(direction);
         break;
       default: break;
     }
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    /*
+     switch (direction) {
+       case LOW:
+         launcherSubsystem.spinMiddleFlywheel(direction);
+         launcherSubsystem.spinBottomFlywheel();
+         break;
+       case HIGH:
+         pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerRight);
+         pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerLeft);
+         launcherSubsystem.spinTopFlywheel(direction);
+         launcherSubsystem.spinMiddleFlywheel(direction);
+         break;
+       case AMP:
+         pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerRight);
+         pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.noteAimerLeft);
+         launcherSubsystem.spinTopFlywheel(direction);
+         launcherSubsystem.spinMiddleFlywheel(direction);
+         break;
+       default: break;
+     }
+     */
+
+    if (controller.getPOV() < 45 || controller.getPOV() > 315) {
+      launchButtonPressed = true;
+    }
     
-    if (launcherSubsystem.isLauncherUpToSpeed(direction) && automatic) {
-      indexerSubsystem.indexNoteLaunchSpeaker(direction == LaunchDirection.AMP);
+    //Need to decide if pressing 'up' should immediately fire note regardless of speed or if accuarcey is more important.
+    //Moves the note into the flywheels if the launchers are up to speed. Automatic mode just does this as soon as possible. Manual mode requires pressing 'up' on the dpad before occuring.
+    if (launcherSubsystem.isLauncherUpToSpeed(direction)) {
+      if (automatic || launchButtonPressed) {
+        indexerSubsystem.indexNote(direction == LaunchDirection.AMP);
+      }
     }
 
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-
-    if (!automatic) {
-      return;
-    }
 
     launcherSubsystem.stopSpinners();
     indexerSubsystem.stopIndexer();
     pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.noteAimerRight);
     pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.noteAimerLeft);
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
   }
 }
 

@@ -88,6 +88,10 @@ public final class Constants {
     public static final double launcherkP = 8.0;
     public static final double launcherkI = 0.001;
     public static final double launcherkD = 0.0;
+
+    public static final double indexerkP = Preferences.getDouble(Keys.indexerkPKey, 0.00);
+    public static final double indexerkI = Preferences.getDouble(Keys.indexerkIKey, 0.00);
+    public static final double indexerkD = Preferences.getDouble(Keys.indexerkDKey, 0.00);
   }
 
   public static final class SystemToggles {
@@ -266,14 +270,21 @@ public final class Constants {
       public static final String intakeVoltKey = "Intake Voltage";
       public static final String speakerHighAimV = "Speaker-Shot High-Aim Velocity";
       public static final String speakerLowAimV = "Speaker-Shot Lower-Aim Velocity";
-      public static final String ampV = "Amplifier-Shot Velocity";
+      public static final String ampUpperV = "Amplifier-Shot Upper Velocity";
+      public static final String ampMiddleV = "Amplifier-Shot Middle Velocity";
       public static final String launcherTolerance = "Launcher Tolerance";
 
       public static final String characterizationKey = "System Characterization Mode";
       public static final String compressorOnlyKey = "Compressor Only Mode";
 
-      public static final String correctNotePositionTimeKey = "Note Correction Outtake Seconds";
+      public static final String correctNotePositionKey = "Note Correction Motor Position";
       public static final String minimumNoteProximityKey = "Note Detection Proximity";
+
+      //Temp for Testing
+      public static final String indexerkPKey = "Indexer kP";
+      public static final String indexerkIKey = "Indexer kI";
+      public static final String indexerkDKey = "Indexer kD";
+      
 
      }
 }

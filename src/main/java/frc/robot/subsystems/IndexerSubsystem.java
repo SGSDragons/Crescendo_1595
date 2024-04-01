@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -8,8 +7,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utilities.LimelightHelpers;
 import frc.lib.utilities.Constants.HardwareID;
 import frc.lib.utilities.Constants.Keys;
+import frc.lib.utilities.Constants.TuningValues;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.ColorSensorV3;
@@ -17,9 +19,9 @@ import com.revrobotics.ColorSensorV3;
 public class IndexerSubsystem extends SubsystemBase{
 
     TalonFX indexerMotor, intakeMotor;
-    //ColorSensorV3 colorSensorLeft, colorSensorRight;
     ColorSensorV3 noteDetector;
-    boolean noteLoaded = false;
+    PositionVoltage returnPosition = new PositionVoltage(0);
+    double targetPosition;
 
     public IndexerSubsystem() {
         indexerMotor = new TalonFX(HardwareID.indexerMotorCANId);
@@ -28,73 +30,68 @@ public class IndexerSubsystem extends SubsystemBase{
         
         indexerMotor.setNeutralMode(NeutralModeValue.Brake);
         indexerMotor.setInverted(true);
+
+        var config = new Slot0Configs();
+        config.kP = TuningValues.indexerkP;
+        config.kI = TuningValues.indexerkI;
+        config.kD = TuningValues.indexerkD;
+        indexerMotor.getConfigurator().apply(config);
+
+        targetPosition = indexerMotor.getPosition().getValueAsDouble();
         
         noteDetector = new ColorSensorV3(I2C.Port.kOnboard);
-        //colorSensorLeft = new ColorSensorV3(I2C.Port.kOnboard);
-        //colorSensorRight = new ColorSensorV3(I2C.Port.kMXP);
-        noteLoaded = false;
     }
 
     public void stopIndexer() {
         indexerMotor.setVoltage(0.0);
     }
 
-    public void indexNoteIntake() {
-        if (!noteLoaded) {
-            indexerMotor.setVoltage(Preferences.getDouble(Keys.intakeVoltKey, 3.0));
-            return;
-        }
-
-        indexerMotor.setVoltage(0.0);
+    public void intakeNote() {
+        indexerMotor.setVoltage(Preferences.getDouble(Keys.intakeVoltKey, 3.0));
     }
 
-    public void indexNoteOuttake() {
+    public void outtakeNote() {
         indexerMotor.setVoltage(-Preferences.getDouble(Keys.intakeVoltKey, 3.0));
     }
 
-    public void indexNoteLaunchSpeaker(boolean ampShot) {
+    public void correctNotePosition() {
+        targetPosition = indexerMotor.getPosition().getValueAsDouble() - Preferences.getDouble(Keys.correctNotePositionKey, 0.85);
+        indexerMotor.setControl(returnPosition.withPosition(targetPosition));
+
+        SmartDashboard.putNumber("Indexer Motor Target Position", targetPosition);
+    }
+    
+    public boolean isNoteCorrectlyPositioned() {
+        if (Math.abs(indexerMotor.getPosition().getValueAsDouble() - targetPosition) < 0.5 ) {
+            return true;
+        }
+        return false;
+    }
+
+    public void indexNote(boolean ampShot) {
         double voltage = ampShot ? Preferences.getDouble(Keys.indexAmpVoltKey, 3.0) : Preferences.getDouble(Keys.indexVoltKey, 6.0);
         indexerMotor.setVoltage(voltage);
     }
-
-    public void indexNoteIntakeDisregardLoading() {
-        indexerMotor.setVoltage(Preferences.getDouble(Keys.intakeVoltKey, 3.0));
-    }
     
-    @Override
-    public void periodic() {
-
+    public boolean isNoteLoaded() {
         int noteProximity = noteDetector.getProximity();
         if (noteProximity > Preferences.getDouble(Keys.minimumNoteProximityKey, 500)) {
             LimelightHelpers.setLEDMode_ForceBlink("limelight");
-            noteLoaded = true;
+            return true;
         }
-        else if (DriverStation.isTeleop()){
-            LimelightHelpers.setLEDMode_ForceOff("limelight");
-        }
-        
-        /*
-        int leftProximity = colorSensorLeft.getProximity();
-        int rightProximity = colorSensorRight.getProximity();
-        if (leftProximity > 250 || rightProximity > 250) {
-            noteLoaded = true;
-        }
-        else {
-            noteLoaded = false;
-        }
-        */
-
-        telemetry();
+        return false;
     }
 
-    public boolean isNoteLoaded() {
-        return noteLoaded;
+    
+    @Override
+    public void periodic() {
+        telemetry();
     }
 
     public void telemetry() {
         SmartDashboard.putNumber("Indexer Motor Velocity", indexerMotor.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Intake Motor Velocity", intakeMotor.getVelocity().getValueAsDouble());
-        SmartDashboard.putBoolean("Note Loaded", noteLoaded);
         SmartDashboard.putNumber("Note Proximity", noteDetector.getProximity());
+        SmartDashboard.putNumber("Indexer Motor Position", indexerMotor.getPosition().getValueAsDouble());
     }
 }

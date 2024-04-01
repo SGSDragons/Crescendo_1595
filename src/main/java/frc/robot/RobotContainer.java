@@ -84,25 +84,21 @@ public class RobotContainer {
   public RobotContainer() {
     initializeRobotPreferences();
     registerNamedCommands();
-
-    //compressorOnly = Preferences.getBoolean(Keys.compressorOnlyKey, false);
-
-    if (!compressorOnly) {
-      drivetrainSubsystem.setDefaultCommand(
-        new TeleopDrive(
-            drivetrainSubsystem,
-            () -> -driver.getRawAxis(translationAxis),
-            () -> -driver.getRawAxis(strafeAxis),
-            () -> -driver.getRawAxis(rotationAxis),
-            () -> robotCentric.getAsBoolean(),
-            () -> autoAim.getAsBoolean(),
-            (intensity) -> {
-              driver.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
-              operator.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
-            }
-          )
-      );
-    }
+    
+    drivetrainSubsystem.setDefaultCommand(
+      new TeleopDrive(
+          drivetrainSubsystem,
+          () -> -driver.getRawAxis(translationAxis),
+          () -> -driver.getRawAxis(strafeAxis),
+          () -> -driver.getRawAxis(rotationAxis),
+          () -> robotCentric.getAsBoolean(),
+          () -> autoAim.getAsBoolean(),
+          (intensity) -> {
+            driver.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
+            operator.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
+          }
+        )
+    );
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Mode", autoChooser);
@@ -131,10 +127,6 @@ public class RobotContainer {
     }
 
     //Keybinds for... actually driving the robot in TeleOP.
-    if (compressorOnly) {
-      pneumaticsSubsystem.enableCompressor();
-      return;
-    }
 
     zeroGyro.onTrue(new InstantCommand(() -> drivetrainSubsystem.zeroHeading()));
 
@@ -151,22 +143,21 @@ public class RobotContainer {
           }
         ));
 
-    //Launches Notes (Automatic launches after spinup, Manual only launches after spinup and button release)
-    launchLowAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true));
-    launchLowManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, false));
-    launchLowManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(0.75));
+    //Launches Notes (Automatic launches after spinup, Manual only launches after spinup and 'up' on dpad)
+
+    launchLowAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true, operator));
+    launchLowManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, false, operator));
     
-    launchHighAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true));
-    launchHighManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, false));
-    launchHighManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true).withTimeout(0.75));
+    launchHighAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true, operator));
+    launchHighManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, false, operator));
     
-    launchAmpAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true));
-    launchAmpManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, false));
-    launchAmpManual.onFalse(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.00));
+    launchAmpAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true, operator));
+    launchAmpManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, false, operator));
     
 
-    indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE_DISREGARD_LOADING));
-    indexerIntake.onFalse(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.1)));
+    indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE));
+    indexerIntake.onFalse(new CorrectNotePosition(indexerSubsystem));
+
     indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
 
     climberUp.onTrue(new InstantCommand(() -> {
@@ -178,24 +169,23 @@ public class RobotContainer {
       pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.rightClimber);
     }));
 
-    compressor.onTrue(new InstantCommand(() -> pneumaticsSubsystem.toggleCompressor()));
+    compressor.onTrue(new InstantCommand(() -> pneumaticsSubsystem.toggleCompressor()).ignoringDisable(true));
   }
   
   private void registerNamedCommands() {
-    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true).withTimeout(1));
-    NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true).withTimeout(1.5));
-    NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true).withTimeout(1.0));
+    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true, operator).withTimeout(1.0));
+    NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true, operator).withTimeout(1.0));
+    NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true, operator).withTimeout(1.0));
+    
     NamedCommands.registerCommand("Intake",
-      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(2.0).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.09)))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
+      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(2.0).andThen(new CorrectNotePosition(indexerSubsystem)));
 
     NamedCommands.registerCommand("IntakeLong",
-      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(7.7).andThen(new Index(indexerSubsystem, IndexDirection.OUTTAKE).withTimeout(Preferences.getDouble(Keys.correctNotePositionTimeKey, 0.09)))); ///Isn't able to detect when to stop, so need to outtake by some arbitrary amount to get note in right position.
+      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(8.0).andThen(new CorrectNotePosition(indexerSubsystem)));
 
-    //NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
-
+    //Auto Aim Commands
     boolean isBlue = isBlue();
     List<LimelightTarget> targets = isBlue ? blueTargets() : redTargets();
-
     for (int i=0; i < targets.size(); ++i) {
       // Play with tolerance until we are happy it gets close enough fast enough.
       NamedCommands.registerCommand("aim-"+i, new Aim(targets.get(i), 6, drivetrainSubsystem));
@@ -243,7 +233,7 @@ public class RobotContainer {
 
   public List<LimelightTarget> redTargets() {
     NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
-    List<LimelightTarget> targets = new ArrayList<>(); //Is it planned for this to have the same targets but with a different tag or something completely different?
+    List<LimelightTarget> targets = new ArrayList<>();
 
     targets.add(new LimelightTarget(
             4,
@@ -264,6 +254,8 @@ public class RobotContainer {
     return targets;
   }
 
+  //I think this is being a HUGE waste of resources while doing ABSOLUTELY NOTHING and frequently causing COMMAND SCHEDULER LOOP OVERRUN
+  /*
   public void updateLLTargetTelemetry() {
     NetworkTableEntry focusT = NetworkTableInstance.getDefault().getTable("sgs").getEntry("ll_target");
     int focus = (int)focusT.getInteger(0);
@@ -273,7 +265,8 @@ public class RobotContainer {
     if (focus >= 0 && focus < targets.size()) {
       targets.get(focus).find(drivetrainSubsystem.getHeading().getDegrees());
     }
-  }
+  } 
+   */
 
   public void initializeRobotPreferences() {
     // Driving
@@ -293,14 +286,19 @@ public class RobotContainer {
     Preferences.initDouble(Keys.intakeVoltKey, 4.5);
     Preferences.initDouble(Keys.speakerHighAimV, 65);
     Preferences.initDouble(Keys.speakerLowAimV, -80);
-    Preferences.initDouble(Keys.ampV, 10);
+    Preferences.initDouble(Keys.ampUpperV, 5.0);
+    Preferences.initDouble(Keys.ampMiddleV, 8.5);
     Preferences.initDouble(Keys.launcherTolerance, 5);
 
     Preferences.initBoolean(Keys.characterizationKey, false);
-    Preferences.initBoolean(Keys.compressorOnlyKey, false);
 
-    Preferences.initDouble(Keys.correctNotePositionTimeKey, 0.11);
     Preferences.initDouble(Keys.minimumNoteProximityKey, 500);
+
+    //Testing
+    Preferences.initDouble(Keys.correctNotePositionKey, 0.85);
+    Preferences.initDouble(Keys.indexerkPKey, 2.00);
+    Preferences.initDouble(Keys.indexerkIKey, 0.00);
+    Preferences.initDouble(Keys.indexerkDKey, 0.20);
 
   }
 }
