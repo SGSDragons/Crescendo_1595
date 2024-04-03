@@ -30,7 +30,7 @@ public class Launch extends Command {
     this.pneumaticsSubsystem = pneumaticsSubsystem;
     this.launcherSubsystem = launcherSubsystem;
     this.indexerSubsystem = indexerSubsystem;
-    addRequirements(launcherSubsystem);
+    addRequirements(launcherSubsystem, indexerSubsystem);
 
     this.direction = direction;
     this.automatic = automatic;
@@ -86,8 +86,14 @@ public class Launch extends Command {
      }
      */
 
-    if (controller.getPOV() < 45 || controller.getPOV() > 315) {
+    if (controller.getPOV() == -1) {
+      launchButtonPressed = false;
+    }
+    else if (controller.getPOV() < 45 || controller.getPOV() > 315) {
       launchButtonPressed = true;
+    }
+    else {
+      launchButtonPressed = false;
     }
     
     //Need to decide if pressing 'up' should immediately fire note regardless of speed or if accuarcey is more important.

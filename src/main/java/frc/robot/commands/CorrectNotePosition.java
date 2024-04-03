@@ -6,6 +6,7 @@ import frc.robot.subsystems.IndexerSubsystem;
 public class CorrectNotePosition extends Command{
     
     private final IndexerSubsystem indexerSubsystem;
+    private double targetPosition;
 
     public CorrectNotePosition(IndexerSubsystem indexerSubsystem) {
         this.indexerSubsystem = indexerSubsystem;
@@ -13,8 +14,13 @@ public class CorrectNotePosition extends Command{
     }
 
     @Override
+    public void initialize() {
+        targetPosition = indexerSubsystem.setTargetPosition();
+    }
+
+    @Override
     public void execute() {
-        indexerSubsystem.correctNotePosition();
+        indexerSubsystem.correctNotePosition(targetPosition);
     }
 
     @Override

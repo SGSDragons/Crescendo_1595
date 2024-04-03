@@ -28,6 +28,7 @@ public class LimelightTarget {
     private final NetworkTableEntry errorY;
     private final NetworkTableEntry errorHeading;
     private final NetworkTableEntry tagVisible;
+    LimelightHelpers.LimelightTarget_Fiducial[] aprilTags;
 
     public LimelightTarget(int tagId, double wantedX, double wantedY, double wantedHeading) {
         this.tagId = tagId;
@@ -42,10 +43,12 @@ public class LimelightTarget {
         errorX = table.getEntry("err_x");
         errorY = table.getEntry("err_y");
         errorHeading = table.getEntry("err_heading");
+
+        aprilTags = LimelightHelpers.getLatestResults("limelight").targetingResults.targets_Fiducials;
     }
 
     public Error find(double heading) {
-        LimelightHelpers.LimelightTarget_Fiducial[] aprilTags = LimelightHelpers.getLatestResults("limelight").targetingResults.targets_Fiducials;
+        aprilTags = LimelightHelpers.getLatestResults("limelight").targetingResults.targets_Fiducials;
 
         // Uncomment to fake a Limelight result
 //        LimelightHelpers.LimelightTarget_Fiducial fakeTag = new LimelightHelpers.LimelightTarget_Fiducial();

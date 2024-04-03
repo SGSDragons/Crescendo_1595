@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.5,
-      "y": 7.0
+      "x": 2,
+      "y": 2
     },
     "rotation": 0
   },
@@ -12,14 +12,14 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "quickPark"
+            "name": "aim-2"
           }
         }
       ]
     }
   },
-  "folder": "SecondComp",
+  "folder": "PNW",
   "choreoAuto": false
 }

@@ -16,10 +16,16 @@
           "data": {
             "name": "Intake"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CorrectNotePosition"
+          }
         }
       ]
     }
   },
-  "folder": "PreSecondComp",
+  "folder": "PNW",
   "choreoAuto": false
 }

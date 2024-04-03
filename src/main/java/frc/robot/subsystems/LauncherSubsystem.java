@@ -70,10 +70,22 @@ public class LauncherSubsystem extends SubsystemBase{
         middleSpinner.setControl(middleSpinnerVelocity.withVelocity(middleSpinnerTargetV));
     }
 
+    public void spinMiddleFlywheel(double velocity) {
+        middleSpinnerTargetV = velocity;
+        middleSpinner.setControl(middleSpinnerVelocity.withVelocity(middleSpinnerTargetV));
+    }
+
 
     public void spinBottomFlywheel() {
 
-        bottomSpinnerTargetV =  Preferences.getDouble(Keys.speakerLowAimV, -80);
+        bottomSpinnerTargetV = Preferences.getDouble(Keys.speakerLowAimV, -80);
+
+        bottomSpinner.setControl(bottomSpinnerVelocity.withVelocity(bottomSpinnerTargetV));
+    }
+
+    public void spinBottomFlywheel(double velocity) {
+
+        bottomSpinnerTargetV = velocity;
 
         bottomSpinner.setControl(bottomSpinnerVelocity.withVelocity(bottomSpinnerTargetV));
     }

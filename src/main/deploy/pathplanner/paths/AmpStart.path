@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 14.399853244150933,
-        "y": 5.556120001128891
+        "x": 0.47537171997421085,
+        "y": 6.985795510052559
       },
       "prevControl": null,
       "nextControl": {
-        "x": 12.41582705387633,
-        "y": 5.305506166567889
+        "x": 1.4753717199742113,
+        "y": 6.985795510052559
       },
       "isLocked": false,
-      "linkedName": "rshot-center"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.280698783619789,
-        "y": 4.115090452403127
+        "x": 1.9850139700279412,
+        "y": 6.44311365545808
       },
       "prevControl": {
-        "x": 12.165213219315328,
-        "y": 3.927130076482375
+        "x": 0.9850139700279412,
+        "y": 6.44311365545808
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "rend-6"
+      "linkedName": "AmpStart-Note1"
     }
   ],
   "rotationTargets": [],
@@ -33,19 +33,19 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.3,
-    "maxAcceleration": 8.6,
+    "maxAcceleration": 7.0,
     "maxAngularVelocity": 802.0,
     "maxAngularAcceleration": 802.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": 16.7,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Updated",
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.41294931829144405,
-      "y": 4.2352248466599285
+      "x": 0.47537171997421085,
+      "y": 6.985795510052559
     },
     "rotation": 0
   },
@@ -14,32 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "tcenter0"
+            "pathName": "AmpStart"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "LaunchNoteLow"
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "tpath 2"
-                }
-              }
-            ]
+            "name": "aim-0"
           }
         },
         {
@@ -53,18 +34,37 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Intake"
+                  "pathName": "Note-1"
                 }
               },
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "tcenter1"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Intake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CorrectNotePosition"
+                      }
+                    }
+                  ]
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "aim-0"
           }
         },
         {
@@ -76,6 +76,6 @@
       ]
     }
   },
-  "folder": "PreSecondComp",
+  "folder": "PNW",
   "choreoAuto": false
 }

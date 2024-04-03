@@ -28,6 +28,9 @@ public class TeleopDrive extends Command {
   private BooleanSupplier autoAim;
   private LimelightTarget speakerTarget;
 
+  LimelightTarget.Error targetLock;
+  double xErr;
+
   public TeleopDrive(
       DrivetrainSubsystem drivetrainSubsystem,
       DoubleSupplier translationSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotationSupplier,
@@ -47,7 +50,7 @@ public class TeleopDrive extends Command {
     this.rumble = rumble;
 
     boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
-    this.speakerTarget = new LimelightTarget(isBlue ? 7 : 4, 0, 6.0, 0.0);
+    this.speakerTarget = new LimelightTarget(isBlue ? 7 : 4, 0, 0.0, 0.0);
   }
 
   @Override
@@ -58,16 +61,22 @@ public class TeleopDrive extends Command {
 
     if (autoAim.getAsBoolean()) {
       LimelightHelpers.setLEDMode_ForceOn("limelight");
-      LimelightTarget.Error targetLock = speakerTarget.find(0); // Heading is unused
+      targetLock = speakerTarget.find(0); // Heading is unused
       if (targetLock != null) {
-        double xErr = MathUtil.applyDeadband(targetLock.x, 3);
+        xErr = MathUtil.applyDeadband(targetLock.x, 3);
         if (Math.abs(xErr) > 5.0) {
-          xErr *= 5.0/xErr;
+           if (xErr > 0) {
+              xErr = 5.0;
+           }
+           else {
+             xErr = -5.0;
+           }
+
         }
         if (xErr == 0.0) {
           rumble.accept(1.0);
         } else {
-          rotationValue += xErr * Aim.headingGain.getDouble(0.0);
+          rotationValue += xErr * 0.01;
         }
       }
     } else {

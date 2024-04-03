@@ -225,6 +225,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     swerveDriveOdometry.update(getGyroYaw(), getModulePositions());
-    telemetry();
+    //SmartDashboard.putNumber("Heading", getHeading().getDegrees());
+    //telemetry();
   }
 }

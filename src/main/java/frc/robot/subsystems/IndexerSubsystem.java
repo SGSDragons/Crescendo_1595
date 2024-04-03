@@ -54,8 +54,11 @@ public class IndexerSubsystem extends SubsystemBase{
         indexerMotor.setVoltage(-Preferences.getDouble(Keys.intakeVoltKey, 3.0));
     }
 
-    public void correctNotePosition() {
-        targetPosition = indexerMotor.getPosition().getValueAsDouble() - Preferences.getDouble(Keys.correctNotePositionKey, 0.85);
+    public double setTargetPosition() {
+        return indexerMotor.getPosition().getValueAsDouble() - Preferences.getDouble(Keys.correctNotePositionKey, 0.85);
+    }
+
+    public void correctNotePosition(double targetPosition) {
         indexerMotor.setControl(returnPosition.withPosition(targetPosition));
 
         SmartDashboard.putNumber("Indexer Motor Target Position", targetPosition);
@@ -89,9 +92,9 @@ public class IndexerSubsystem extends SubsystemBase{
     }
 
     public void telemetry() {
-        SmartDashboard.putNumber("Indexer Motor Velocity", indexerMotor.getVelocity().getValueAsDouble());
-        SmartDashboard.putNumber("Intake Motor Velocity", intakeMotor.getVelocity().getValueAsDouble());
-        SmartDashboard.putNumber("Note Proximity", noteDetector.getProximity());
+        //SmartDashboard.putNumber("Indexer Motor Velocity", indexerMotor.getVelocity().getValueAsDouble());
+        //SmartDashboard.putNumber("Intake Motor Velocity", intakeMotor.getVelocity().getValueAsDouble());
+        //SmartDashboard.putNumber("Note Proximity", noteDetector.getProximity());
         SmartDashboard.putNumber("Indexer Motor Position", indexerMotor.getPosition().getValueAsDouble());
     }
 }

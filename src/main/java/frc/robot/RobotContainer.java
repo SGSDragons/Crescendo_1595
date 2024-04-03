@@ -23,10 +23,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import frc.lib.utilities.Constants.Keys;
-
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Preferences;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -155,10 +151,10 @@ public class RobotContainer {
     launchAmpManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, false, operator));
     
 
-    indexerIntake.whileTrue(new Index(indexerSubsystem, IndexDirection.INTAKE));
+    indexerIntake.whileTrue(new Index(indexerSubsystem, launcherSubsystem, IndexDirection.INTAKE));
     indexerIntake.onFalse(new CorrectNotePosition(indexerSubsystem));
 
-    indexerOuttake.whileTrue(new Index(indexerSubsystem, IndexDirection.OUTTAKE));
+    indexerOuttake.whileTrue(new Index(indexerSubsystem, launcherSubsystem, IndexDirection.OUTTAKE));
 
     climberUp.onTrue(new InstantCommand(() -> {
       pneumaticsSubsystem.setSolenoidToForward(pneumaticsSubsystem.leftClimber);
@@ -169,26 +165,28 @@ public class RobotContainer {
       pneumaticsSubsystem.setSolenoidToReverse(pneumaticsSubsystem.rightClimber);
     }));
 
-    compressor.onTrue(new InstantCommand(() -> pneumaticsSubsystem.toggleCompressor()).ignoringDisable(true));
+    compressor.onTrue(new InstantCommand(() -> pneumaticsSubsystem.toggleCompressor()));
   }
   
   private void registerNamedCommands() {
-    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true, operator).withTimeout(1.0));
-    NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true, operator).withTimeout(1.0));
-    NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true, operator).withTimeout(1.0));
+    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true, operator).withTimeout(1.5));
+    NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true, operator).withTimeout(1.5));
+    NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true, operator).withTimeout(1.5));
     
     NamedCommands.registerCommand("Intake",
-      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(2.0).andThen(new CorrectNotePosition(indexerSubsystem)));
+      new Index(indexerSubsystem, launcherSubsystem, IndexDirection.INTAKE).withTimeout(1.25));
 
     NamedCommands.registerCommand("IntakeLong",
-      new Index(indexerSubsystem, IndexDirection.INTAKE).withTimeout(8.0).andThen(new CorrectNotePosition(indexerSubsystem)));
+      new Index(indexerSubsystem, launcherSubsystem, IndexDirection.INTAKE).withTimeout(7.5));
+
+    NamedCommands.registerCommand("CorrectNotePosition", new CorrectNotePosition(indexerSubsystem).withTimeout(0.5));
 
     //Auto Aim Commands
     boolean isBlue = isBlue();
     List<LimelightTarget> targets = isBlue ? blueTargets() : redTargets();
     for (int i=0; i < targets.size(); ++i) {
       // Play with tolerance until we are happy it gets close enough fast enough.
-      NamedCommands.registerCommand("aim-"+i, new Aim(targets.get(i), 6, drivetrainSubsystem));
+      NamedCommands.registerCommand("aim-"+i, new AimSimple(targets.get(i), drivetrainSubsystem).withTimeout(0.75));
     }
   }
 
@@ -198,14 +196,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     drivetrainSubsystem.zeroHeading();
-    if (SystemToggles.useCompleteAuto) {
-      boolean isBlue = isBlue();
-      String pathFile = isBlue ? "Auto-Blue" : "Auto-Red";
-      return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathFile));
-    }
-    else {
-      return autoChooser.getSelected();
-    }
+    return autoChooser.getSelected();
   }
 
   public List<LimelightTarget> blueTargets() {
@@ -214,19 +205,28 @@ public class RobotContainer {
 
     targets.add(new LimelightTarget(
         7,
-        sgs.getEntry("aim_0_tx").getDouble(0.0),
-        sgs.getEntry("aim_0_ty").getDouble(0.0),
-        sgs.getEntry("aim_0_heading").getDouble(-150.0)));
+        -5.385597,
+        7.125707,
+        -12.60));
+        // sgs.getEntry("aim_0_tx").getDouble(0.0),
+        // sgs.getEntry("aim_0_ty").getDouble(0.0),
+        // sgs.getEntry("aim_0_heading").getDouble(-150.0)));
     targets.add(new LimelightTarget(
         7,
-        sgs.getEntry("aim_1_tx").getDouble(0.0),
-        sgs.getEntry("aim_1_ty").getDouble(0.0),
-        sgs.getEntry("aim_1_heading").getDouble(-160.0)));
+        -3.069734,
+        5.153919,
+        165.569999));
+        // sgs.getEntry("aim_1_tx").getDouble(0.0),
+        // sgs.getEntry("aim_1_ty").getDouble(0.0),
+        // sgs.getEntry("aim_1_heading").getDouble(-160.0)));
     targets.add(new LimelightTarget(
         7,
-        sgs.getEntry("aim_2_tx").getDouble(0.0),
-        sgs.getEntry("aim_2_ty").getDouble(0.0),
-        sgs.getEntry("aim_2_heading").getDouble(-180.0)));
+        5.330149,
+        7.127398,
+        150.020));
+        // sgs.getEntry("aim_2_tx").getDouble(0.0),
+        // sgs.getEntry("aim_2_ty").getDouble(0.0),
+        // sgs.getEntry("aim_2_heading").getDouble(-180.0)));
 
     return targets;
   }
@@ -237,25 +237,34 @@ public class RobotContainer {
 
     targets.add(new LimelightTarget(
             4,
-            sgs.getEntry("aim_0_tx").getDouble(0.0),
-            sgs.getEntry("aim_0_ty").getDouble(6.0),
-            sgs.getEntry("aim_0_heading").getDouble(150.0)));
+            5.385597,
+            7.125707,
+            12.60));
+            // sgs.getEntry("aim_0_tx").getDouble(0.0),
+            // sgs.getEntry("aim_0_ty").getDouble(6.0),
+            // sgs.getEntry("aim_0_heading").getDouble(150.0)));
     targets.add(new LimelightTarget(
             4,
-            sgs.getEntry("aim_1_tx").getDouble(0.0),
-            sgs.getEntry("aim_1_ty").getDouble(0.0),
-            sgs.getEntry("aim_1_heading").getDouble(160.0)));
+            3.069734,
+            5.153919,
+            -165.569999));
+            // sgs.getEntry("aim_1_tx").getDouble(0.0),
+            // sgs.getEntry("aim_1_ty").getDouble(0.0),
+            // sgs.getEntry("aim_1_heading").getDouble(160.0)));
     targets.add(new LimelightTarget(
             4,
-            sgs.getEntry("aim_2_tx").getDouble(0.0),
-            sgs.getEntry("aim_2_ty").getDouble(0.0),
-            sgs.getEntry("aim_2_heading").getDouble(180.0)));
+            -5.330149,
+            7.127398,
+            -150.020));
+            // sgs.getEntry("aim_2_tx").getDouble(0.0),
+            // sgs.getEntry("aim_2_ty").getDouble(0.0),
+            // sgs.getEntry("aim_2_heading").getDouble(180.0)));
 
     return targets;
   }
 
   //I think this is being a HUGE waste of resources while doing ABSOLUTELY NOTHING and frequently causing COMMAND SCHEDULER LOOP OVERRUN
-  /*
+  
   public void updateLLTargetTelemetry() {
     NetworkTableEntry focusT = NetworkTableInstance.getDefault().getTable("sgs").getEntry("ll_target");
     int focus = (int)focusT.getInteger(0);
@@ -266,17 +275,17 @@ public class RobotContainer {
       targets.get(focus).find(drivetrainSubsystem.getHeading().getDegrees());
     }
   } 
-   */
+   
 
   public void initializeRobotPreferences() {
     // Driving
     Preferences.initDouble(Keys.angle_kPKey, 100.0);
     Preferences.initDouble(Keys.drive_kPKey, 0.12);
-    Preferences.initDouble(Keys.drive_kSKey, 0.32);
-    Preferences.initDouble(Keys.drive_kVKey, 1.51);
-    Preferences.initDouble(Keys.drive_kAKey, 0.27);
-    Preferences.initDouble(Keys.auto_kPXKey, 3);
-    Preferences.initDouble(Keys.auto_kPThetaKey, 4);
+    Preferences.initDouble(Keys.drive_kSKey, 1.654475);
+    Preferences.initDouble(Keys.drive_kVKey, 10.79925);
+    Preferences.initDouble(Keys.drive_kAKey, 0.506595);
+    Preferences.initDouble(Keys.auto_kPXKey,10.5);
+    Preferences.initDouble(Keys.auto_kPThetaKey, 7.6);
     Preferences.initDouble(Keys.maxSpeedKey, 4.17);
     Preferences.initDouble(Keys.maxAngularVelocityKey, 29.65);
 
@@ -288,7 +297,7 @@ public class RobotContainer {
     Preferences.initDouble(Keys.speakerLowAimV, -80);
     Preferences.initDouble(Keys.ampUpperV, 5.0);
     Preferences.initDouble(Keys.ampMiddleV, 8.5);
-    Preferences.initDouble(Keys.launcherTolerance, 5);
+    Preferences.initDouble(Keys.launcherTolerance, 6);
 
     Preferences.initBoolean(Keys.characterizationKey, false);
 
@@ -299,6 +308,5 @@ public class RobotContainer {
     Preferences.initDouble(Keys.indexerkPKey, 2.00);
     Preferences.initDouble(Keys.indexerkIKey, 0.00);
     Preferences.initDouble(Keys.indexerkDKey, 0.20);
-
   }
 }
