@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.path.PathPlannerPath;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
@@ -13,7 +11,7 @@ import edu.wpi.first.wpilibj.*;
 import frc.lib.utilities.LimelightTarget;
 import frc.robot.commands.*;
 import frc.robot.commands.Index.IndexDirection;
-import frc.robot.commands.Launch.LaunchDirection;
+import frc.robot.commands.LaunchTeleop.LaunchDirection;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
@@ -27,16 +25,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.utilities.Constants.OperatorConstants;
-import frc.lib.utilities.Constants.SystemToggles;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RobotContainer {
-  private static boolean compressorOnly = false;
+  public final static boolean isBlue = isBlue();
 
   private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
@@ -52,7 +50,7 @@ public class RobotContainer {
 
   private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kStart.value);
   private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-  private final JoystickButton slowAim = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+  private final JoystickButton slowTurn = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
 
   private final JoystickButton climberUp = new JoystickButton(operator, XboxController.Button.kLeftStick.value);
   private final JoystickButton climberDown = new JoystickButton(operator, XboxController.Button.kRightStick.value);
@@ -72,8 +70,6 @@ public class RobotContainer {
   
   private final JoystickButton compressor = new JoystickButton(driver, XboxController.Button.kX.value);
 
-  //private final POVButton correctNotePosition = new POVButton(operator, 180);
-
   private SendableChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -87,14 +83,8 @@ public class RobotContainer {
           () -> -driver.getRawAxis(translationAxis),
           () -> -driver.getRawAxis(strafeAxis),
           () -> -driver.getRawAxis(rotationAxis),
-          () -> robotCentric.getAsBoolean(),
-          () -> autoAim.getAsBoolean(),
-          (intensity) -> {
-            driver.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
-            operator.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
-          }
-        )
-    );
+          () -> robotCentric.getAsBoolean()
+          ));
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Mode", autoChooser);
@@ -105,50 +95,38 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    //The keybinds and commands for system identification only load if the mode is enabled in constants (for programming purposes).
-    if (Preferences.getBoolean(Keys.characterizationKey, false)) {
-      JoystickButton driveQuasiForward = new JoystickButton(driver, XboxController.Button.kBack.value);
-      JoystickButton driveQuasiBackward = new JoystickButton(driver, XboxController.Button.kStart.value);
-      JoystickButton driveDynamicForward = new JoystickButton(driver, XboxController.Button.kX.value);
-      JoystickButton driveDynamicBackward = new JoystickButton(driver, XboxController.Button.kB.value);
-      
-      
-      driveQuasiForward.whileTrue(drivetrainSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      driveQuasiBackward.whileTrue(drivetrainSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      driveDynamicForward.whileTrue(drivetrainSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      driveDynamicBackward.whileTrue(drivetrainSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-      
-      //No Other Keybinds will Load in System Identification Mode, for no other keybinds will be assigned to actions.
-      return;
-    }
-
     //Keybinds for... actually driving the robot in TeleOP.
-
     zeroGyro.onTrue(new InstantCommand(() -> drivetrainSubsystem.zeroHeading()));
 
-    slowAim.whileTrue(new TeleopDrive(
+    slowTurn.whileTrue(new TeleopDrive(
+          drivetrainSubsystem,
+          () -> -driver.getRawAxis(translationAxis),
+          () -> -driver.getRawAxis(strafeAxis),
+          () -> -driver.getRawAxis(rotationAxis) * 0.25,
+          () -> robotCentric.getAsBoolean()
+          ));
+
+    autoAim.whileTrue(new TeleopAim(
           drivetrainSubsystem,
           () -> -driver.getRawAxis(translationAxis),
           () -> -driver.getRawAxis(strafeAxis),
           () -> -driver.getRawAxis(rotationAxis) * 0.25,
           () -> robotCentric.getAsBoolean(),
-          () -> autoAim.getAsBoolean(),
-          (intensity) -> {
-            driver.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
-            operator.setRumble(GenericHID.RumbleType.kBothRumble, intensity);
+          (rumbleIntensity) -> {
+            driver.setRumble(GenericHID.RumbleType.kBothRumble, rumbleIntensity);
+            operator.setRumble(GenericHID.RumbleType.kBothRumble, rumbleIntensity);
           }
-        ));
+          ));
 
     //Launches Notes (Automatic launches after spinup, Manual only launches after spinup and 'up' on dpad)
-
-    launchLowAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true, operator));
-    launchLowManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, false, operator));
+    launchLowAutomatic.whileTrue(new LaunchTeleop(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true, operator));
+    launchLowManual.whileTrue(new LaunchTeleop(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, false, operator));
     
-    launchHighAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true, operator));
-    launchHighManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, false, operator));
+    launchHighAutomatic.whileTrue(new LaunchTeleop(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true, operator));
+    launchHighManual.whileTrue(new LaunchTeleop(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, false, operator));
     
-    launchAmpAutomatic.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true, operator));
-    launchAmpManual.whileTrue(new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, false, operator));
+    launchAmpAutomatic.whileTrue(new LaunchTeleop(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true, operator));
+    launchAmpManual.whileTrue(new LaunchTeleop(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, false, operator));
     
 
     indexerIntake.whileTrue(new Index(indexerSubsystem, launcherSubsystem, IndexDirection.INTAKE));
@@ -167,26 +145,28 @@ public class RobotContainer {
 
     compressor.onTrue(new InstantCommand(() -> pneumaticsSubsystem.toggleCompressor()));
   }
+
+  // private boolean isControllerRightAxisPressed (Joystick controller) {
+  //   return controller.getRawAxis(3) > 0.25;
+  // }
   
   private void registerNamedCommands() {
-    NamedCommands.registerCommand("LaunchNoteLow", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.LOW, true, operator).withTimeout(1.5));
-    NamedCommands.registerCommand("LaunchNoteHigh", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH, true, operator).withTimeout(1.5));
-    NamedCommands.registerCommand("LaunchNoteAmp", new Launch(launcherSubsystem, indexerSubsystem, pneumaticsSubsystem, LaunchDirection.AMP, true, operator).withTimeout(1.5));
+    NamedCommands.registerCommand("LaunchNoteLow", new ParallelDeadlineGroup(new SpinLauncher(launcherSubsystem, pneumaticsSubsystem, LaunchDirection.LOW).withTimeout(1.0), new WaitCommand(0.5).andThen(new Index(indexerSubsystem, launcherSubsystem, IndexDirection.LAUNCH))));
+    NamedCommands.registerCommand("LaunchNoteHigh", new ParallelDeadlineGroup(new SpinLauncher(launcherSubsystem, pneumaticsSubsystem, LaunchDirection.HIGH).withTimeout(1.0), new WaitCommand(0.5).andThen(new Index(indexerSubsystem, launcherSubsystem, IndexDirection.LAUNCH))));
+    NamedCommands.registerCommand("LaunchNoteAmp", new ParallelDeadlineGroup(new SpinLauncher(launcherSubsystem, pneumaticsSubsystem, LaunchDirection.AMP).withTimeout(1.0), new WaitCommand(0.5).andThen(new Index(indexerSubsystem, launcherSubsystem, IndexDirection.LAUNCH))));
     
     NamedCommands.registerCommand("Intake",
       new Index(indexerSubsystem, launcherSubsystem, IndexDirection.INTAKE).withTimeout(1.25));
 
     NamedCommands.registerCommand("IntakeLong",
-      new Index(indexerSubsystem, launcherSubsystem, IndexDirection.INTAKE).withTimeout(7.5));
+      new Index(indexerSubsystem, launcherSubsystem, IndexDirection.INTAKE).withTimeout(4.0));
 
     NamedCommands.registerCommand("CorrectNotePosition", new CorrectNotePosition(indexerSubsystem).withTimeout(0.5));
 
     //Auto Aim Commands
-    boolean isBlue = isBlue();
     List<LimelightTarget> targets = isBlue ? blueTargets() : redTargets();
     for (int i=0; i < targets.size(); ++i) {
-      // Play with tolerance until we are happy it gets close enough fast enough.
-      NamedCommands.registerCommand("aim-"+i, new AimSimple(targets.get(i), drivetrainSubsystem).withTimeout(0.75));
+      NamedCommands.registerCommand("aim-"+i, new AutoAim(targets.get(i), drivetrainSubsystem).withTimeout(0.75));
     }
   }
 
@@ -195,76 +175,35 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    drivetrainSubsystem.zeroHeading();
+    //drivetrainSubsystem.zeroHeading();
     return autoChooser.getSelected();
   }
 
   public List<LimelightTarget> blueTargets() {
-    NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
     List<LimelightTarget> targets = new ArrayList<>();
 
     targets.add(new LimelightTarget(
         7,
-        -5.385597,
+        // -5.385597,
+        0,
         7.125707,
         -12.60));
-        // sgs.getEntry("aim_0_tx").getDouble(0.0),
-        // sgs.getEntry("aim_0_ty").getDouble(0.0),
-        // sgs.getEntry("aim_0_heading").getDouble(-150.0)));
-    targets.add(new LimelightTarget(
-        7,
-        -3.069734,
-        5.153919,
-        165.569999));
-        // sgs.getEntry("aim_1_tx").getDouble(0.0),
-        // sgs.getEntry("aim_1_ty").getDouble(0.0),
-        // sgs.getEntry("aim_1_heading").getDouble(-160.0)));
-    targets.add(new LimelightTarget(
-        7,
-        5.330149,
-        7.127398,
-        150.020));
-        // sgs.getEntry("aim_2_tx").getDouble(0.0),
-        // sgs.getEntry("aim_2_ty").getDouble(0.0),
-        // sgs.getEntry("aim_2_heading").getDouble(-180.0)));
-
     return targets;
   }
 
   public List<LimelightTarget> redTargets() {
-    NetworkTable sgs = NetworkTableInstance.getDefault().getTable("sgs");
     List<LimelightTarget> targets = new ArrayList<>();
 
     targets.add(new LimelightTarget(
             4,
-            5.385597,
+            // 5.385597,
+            0,
             7.125707,
             12.60));
-            // sgs.getEntry("aim_0_tx").getDouble(0.0),
-            // sgs.getEntry("aim_0_ty").getDouble(6.0),
-            // sgs.getEntry("aim_0_heading").getDouble(150.0)));
-    targets.add(new LimelightTarget(
-            4,
-            3.069734,
-            5.153919,
-            -165.569999));
-            // sgs.getEntry("aim_1_tx").getDouble(0.0),
-            // sgs.getEntry("aim_1_ty").getDouble(0.0),
-            // sgs.getEntry("aim_1_heading").getDouble(160.0)));
-    targets.add(new LimelightTarget(
-            4,
-            -5.330149,
-            7.127398,
-            -150.020));
-            // sgs.getEntry("aim_2_tx").getDouble(0.0),
-            // sgs.getEntry("aim_2_ty").getDouble(0.0),
-            // sgs.getEntry("aim_2_heading").getDouble(180.0)));
-
     return targets;
   }
 
-  //I think this is being a HUGE waste of resources while doing ABSOLUTELY NOTHING and frequently causing COMMAND SCHEDULER LOOP OVERRUN
-  
+  //Network Tables Telemetry, KEEP OFF DURING MATHCES ON FIELD TO CONSERVE BANDWIDTH
   public void updateLLTargetTelemetry() {
     NetworkTableEntry focusT = NetworkTableInstance.getDefault().getTable("sgs").getEntry("ll_target");
     int focus = (int)focusT.getInteger(0);
@@ -277,26 +216,14 @@ public class RobotContainer {
   } 
    
 
+  //Some of these values will be phased out for performance enhancement.
   public void initializeRobotPreferences() {
     // Driving
-    Preferences.initDouble(Keys.angle_kPKey, 100.0);
-    Preferences.initDouble(Keys.drive_kPKey, 0.12);
-    Preferences.initDouble(Keys.drive_kSKey, 1.654475);
-    Preferences.initDouble(Keys.drive_kVKey, 10.79925);
-    Preferences.initDouble(Keys.drive_kAKey, 0.506595);
     Preferences.initDouble(Keys.auto_kPXKey,10.5);
     Preferences.initDouble(Keys.auto_kPThetaKey, 7.6);
     Preferences.initDouble(Keys.maxSpeedKey, 4.17);
     Preferences.initDouble(Keys.maxAngularVelocityKey, 29.65);
 
-    //Intake, Index, Launch
-    Preferences.initDouble(Keys.indexVoltKey, 6.0);
-    Preferences.initDouble(Keys.indexAmpVoltKey, 3.0);
-    Preferences.initDouble(Keys.intakeVoltKey, 4.5);
-    Preferences.initDouble(Keys.speakerHighAimV, 65);
-    Preferences.initDouble(Keys.speakerLowAimV, -80);
-    Preferences.initDouble(Keys.ampUpperV, 5.0);
-    Preferences.initDouble(Keys.ampMiddleV, 8.5);
     Preferences.initDouble(Keys.launcherTolerance, 6);
 
     Preferences.initBoolean(Keys.characterizationKey, false);

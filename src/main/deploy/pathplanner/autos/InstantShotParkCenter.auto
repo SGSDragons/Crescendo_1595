@@ -2,30 +2,36 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2,
-      "y": 2
+      "x": 1.3140196323188638,
+      "y": 5.527514849608872
     },
-    "rotation": 0
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Intake"
+            "waitTime": 7.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "CorrectNotePosition"
+            "name": "LaunchNoteHigh"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterSpeakerPark"
           }
         }
       ]
     }
   },
-  "folder": "Test",
+  "folder": "PNW",
   "choreoAuto": false
 }

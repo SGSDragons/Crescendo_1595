@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.lib.utilities.LimelightHelpers;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,6 +14,7 @@ public class Index extends Command {
   public enum IndexDirection {
     INTAKE,
     OUTTAKE,
+    LAUNCH
   }
 
   private final IndexerSubsystem indexerSubsystem;
@@ -28,7 +30,7 @@ public class Index extends Command {
   }
 
 
-  @Override //Test if on Initialization is better overall:
+  @Override
   public void initialize() {
     switch (direction) {
       case INTAKE:
@@ -39,6 +41,8 @@ public class Index extends Command {
       case OUTTAKE:
         indexerSubsystem.outtakeNote();
         break;
+      case LAUNCH:
+        indexerSubsystem.indexNote(false);
       default:
         break;
     }
@@ -47,32 +51,18 @@ public class Index extends Command {
 
   @Override
   public void execute() {
-    /*
-     * 
      if (indexerSubsystem.isNoteLoaded()) {
        LimelightHelpers.setLEDMode_ForceOn("limelight");
-     }
-     */
-
-
-/*
- switch (direction) {
-   case INTAKE:
-     indexerSubsystem.intakeNote();
-     break;
-   case OUTTAKE:
-     indexerSubsystem.outtakeNote();
-     break;
-   default: break;
- }
- */
-  }
+   }
+}
 
   @Override
   public void end(boolean interrupted) {
       indexerSubsystem.stopIndexer();
-      launcherSubsystem.stopSpinners();
-      //LimelightHelpers.setLEDMode_ForceOff("limelight");
+      if (direction == IndexDirection.INTAKE) {
+        launcherSubsystem.stopSpinners();
+      }
+      LimelightHelpers.setLEDMode_ForceOff("limelight");
   }
 }
 

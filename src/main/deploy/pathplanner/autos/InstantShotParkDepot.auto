@@ -2,30 +2,36 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2,
-      "y": 2
+      "x": 0.6230802761177547,
+      "y": 4.379852868122284
     },
-    "rotation": 0
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Intake"
+            "waitTime": 7.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "CorrectNotePosition"
+            "name": "LaunchNoteHigh"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotSpeakerPark"
           }
         }
       ]
     }
   },
-  "folder": "Test",
+  "folder": "PNW",
   "choreoAuto": false
 }

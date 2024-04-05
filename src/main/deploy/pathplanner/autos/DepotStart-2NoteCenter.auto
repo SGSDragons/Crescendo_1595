@@ -1,0 +1,107 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.48255023756837656,
+      "y": 4.133925300660873
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotStart"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.25
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "aim-0"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LaunchNoteLow"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Note-8"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeLong"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "CorrectNotePosition"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.25
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "aim-0"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LaunchNoteLow"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "folder": "PNW",
+  "choreoAuto": false
+}

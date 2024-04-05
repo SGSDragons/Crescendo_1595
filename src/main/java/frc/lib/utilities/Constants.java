@@ -89,10 +89,22 @@ public final class Constants {
     public static final double launcherkI = 0.001;
     public static final double launcherkD = 0.0;
 
-    public static final double indexerkP = Preferences.getDouble(Keys.indexerkPKey, 0.00);
-    public static final double indexerkI = Preferences.getDouble(Keys.indexerkIKey, 0.00);
-    public static final double indexerkD = Preferences.getDouble(Keys.indexerkDKey, 0.00);
+    public static final double indexerkP = 2.0;
+    public static final double indexerkI = 0.0;
+    public static final double indexerkD = 0.2;
   }
+
+  public static final class VoltageVelocityValues {
+    public static final double ampUpperV = 6.0;
+    public static final double ampMiddleV = 9.5;
+    public static final double speakerHighAimV = 65;
+    public static final double speakerLowAimV = -80;
+
+    public static final double indexVolt = 6.0;
+    public static final double indexAmpVolt = 3.0;
+    public static final double intakeVolt = 4.5;
+  }
+  
 
   public static final class SystemToggles {
     public static final boolean useCompleteAuto = false;
@@ -146,13 +158,13 @@ public final class Constants {
   
          /* Angle Motor PID Values */
          //public static final double angleKP = chosenModule.angleKP;
-         public static final double angleKP = Preferences.getDouble(Keys.angle_kPKey, 100.0);
+         public static final double angleKP = 100.0;
          public static final double angleKI = chosenModule.angleKI;
          public static final double angleKD = chosenModule.angleKD;
   
          /* Drive Motor PID Values */
          //public static final double driveKP = 0.12; //TODO: This must be tuned to specific robot
-         public static double driveKP = Preferences.getDouble(Keys.drive_kPKey, 0.12);
+         public static final double driveKP = 0.12;
 
          public static final double driveKI = 0.0;
          public static final double driveKD = 0.0;
@@ -163,9 +175,9 @@ public final class Constants {
          //public static final double driveKV = 1.51;
          //public static final double driveKA = 0.27;
 
-         public static double driveKS = Preferences.getDouble(Keys.drive_kSKey, 0.32);
-         public static double driveKV = Preferences.getDouble(Keys.drive_kVKey, 1.51);
-         public static double driveKA = Preferences.getDouble(Keys.drive_kAKey, 0.27);
+         public static final double driveKS = 1.654475;
+         public static final double driveKV = 10.79925;
+         public static final double driveKA = 0.506595;
   
          /* Swerve Profiling Values */
          /** Meters per Second */
@@ -173,8 +185,8 @@ public final class Constants {
          /** Radians per Second */
          //public static final double maxAngularVelocity = 8.0; //TODO: This must be tuned to specific robot
 
-         public static double maxSpeed = Preferences.getDouble(Keys.maxSpeedKey, 4.17);
-         public static double maxAngularVelocity = Preferences.getDouble(Keys.maxAngularVelocityKey, 29.65);
+         public static final double maxSpeed = Preferences.getDouble(Keys.maxSpeedKey, 4.17);
+         public static final double maxAngularVelocity = Preferences.getDouble(Keys.maxAngularVelocityKey, 29.65);
 
          /* Neutral Modes */
          public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
@@ -234,8 +246,8 @@ public final class Constants {
           public static final double kPThetaController = 4;
           */
 
-          public static double kPXController = Preferences.getDouble(Keys.auto_kPXKey, 3);
-          public static double kPThetaController = Preferences.getDouble(Keys.auto_kPThetaKey, 4);
+          public static double kPXController = Preferences.getDouble(Keys.auto_kPXKey, 10.5);
+          public static double kPThetaController = Preferences.getDouble(Keys.auto_kPThetaKey, 7.6);
      
          /* Constraint for the motion profilied robot angle controller */
          public static final TrapezoidProfile.Constraints kThetaControllerConstraints =

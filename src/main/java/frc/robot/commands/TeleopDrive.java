@@ -4,14 +4,10 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.lib.utilities.Constants;
-import frc.lib.utilities.LimelightHelpers;
-import frc.lib.utilities.LimelightTarget;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -24,65 +20,27 @@ public class TeleopDrive extends Command {
   private DoubleSupplier strafeSupplier;
   private DoubleSupplier rotationSupplier;
   private BooleanSupplier robotCentricSupplier;
-  private DoubleConsumer rumble;
-  private BooleanSupplier autoAim;
-  private LimelightTarget speakerTarget;
 
-  LimelightTarget.Error targetLock;
-  double xErr;
+  private double translationValue, strafeValue, rotationValue;
 
   public TeleopDrive(
       DrivetrainSubsystem drivetrainSubsystem,
       DoubleSupplier translationSupplier, DoubleSupplier strafeSupplier, DoubleSupplier rotationSupplier,
-      BooleanSupplier robotCentricSupplier,
-      BooleanSupplier autoAim,
-      DoubleConsumer rumble
-    )
-  {
-    this.drivetrainSubsystem = drivetrainSubsystem;
-    addRequirements(drivetrainSubsystem);
-
-    this.translationSupplier = translationSupplier;
-    this.strafeSupplier = strafeSupplier;
-    this.rotationSupplier = rotationSupplier;
-    this.robotCentricSupplier = robotCentricSupplier;
-    this.autoAim = autoAim;
-    this.rumble = rumble;
-
-    boolean isBlue = DriverStation.getAlliance().filter(a -> a == DriverStation.Alliance.Blue).isPresent();
-    this.speakerTarget = new LimelightTarget(isBlue ? 7 : 4, 0, 0.0, 0.0);
-  }
-
+      BooleanSupplier robotCentricSupplier) {
+        this.drivetrainSubsystem = drivetrainSubsystem;
+        addRequirements(drivetrainSubsystem);
+    
+        this.translationSupplier = translationSupplier;
+        this.strafeSupplier = strafeSupplier;
+        this.rotationSupplier = rotationSupplier;
+        this.robotCentricSupplier = robotCentricSupplier;
+      }
+      
   @Override
   public void execute() {
-    double translationValue = MathUtil.applyDeadband(translationSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
-    double strafeValue = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
-    double rotationValue = MathUtil.applyDeadband(rotationSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
-
-    if (autoAim.getAsBoolean()) {
-      LimelightHelpers.setLEDMode_ForceOn("limelight");
-      targetLock = speakerTarget.find(0); // Heading is unused
-      if (targetLock != null) {
-        xErr = MathUtil.applyDeadband(targetLock.x, 3);
-        if (Math.abs(xErr) > 5.0) {
-           if (xErr > 0) {
-              xErr = 5.0;
-           }
-           else {
-             xErr = -5.0;
-           }
-
-        }
-        if (xErr == 0.0) {
-          rumble.accept(1.0);
-        } else {
-          rotationValue += xErr * 0.01;
-        }
-      }
-    } else {
-      rumble.accept(0.0);
-      LimelightHelpers.setLEDMode_ForceOff("limelight");
-    }
+    translationValue = MathUtil.applyDeadband(translationSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
+    strafeValue = MathUtil.applyDeadband(strafeSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
+    rotationValue = MathUtil.applyDeadband(rotationSupplier.getAsDouble(), Constants.OperatorConstants.stickDeadband);
 
     drivetrainSubsystem.drive(
       new Translation2d(translationValue, strafeValue).times(Constants.SwerveConstants.maxSpeed),

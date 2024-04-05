@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.utilities.Constants.AutoConstants;
 import frc.lib.utilities.Constants.SwerveConstants;
 import frc.lib.utilities.swerve.COTSTalonFXSwerveConstants.SDS.MK4;
+import frc.robot.RobotContainer;
 import frc.lib.utilities.swerve.Conversions;
 import frc.lib.utilities.swerve.SwerveModule;
 
@@ -72,13 +73,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this::getChassisSpeeds,
       this::drive,
       AutoConstants.pathPlannerConfig,
-      () -> {
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-          return alliance.get() == DriverStation.Alliance.Red;
-        }
-        return false;
-      },
+      () -> !RobotContainer.isBlue,
+      // () -> {
+      //   var alliance = DriverStation.getAlliance();
+      //   if (alliance.isPresent()) {
+      //     return alliance.get() == DriverStation.Alliance.Red;
+      //   }
+      //   return false;
+      // },
       this);
   }
 

@@ -30,7 +30,7 @@ public class CorrectNotePosition extends Command{
 
     @Override
     public boolean isFinished() {
-        return indexerSubsystem.isNoteCorrectlyPositioned();
+        return indexerSubsystem.isNoteCorrectlyPositioned(targetPosition);
     }
 
 }

@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -14,7 +15,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.utilities.Constants.HardwareID;
 import frc.lib.utilities.Constants.Keys;
 import frc.lib.utilities.Constants.TuningValues;
-import frc.robot.commands.Launch.LaunchDirection;
+import frc.lib.utilities.Constants.VoltageVelocityValues;
+import frc.robot.commands.LaunchTeleop.LaunchDirection;
 
 public class LauncherSubsystem extends SubsystemBase{
 
@@ -30,30 +32,17 @@ public class LauncherSubsystem extends SubsystemBase{
         bottomSpinner = new TalonFX(HardwareID.bottomSpinnerMotorCANId);
         middleSpinner = new TalonFX(HardwareID.middleSpinnerMotorCANId);
         topSpinner = new TalonFX(HardwareID.topSpinnerMotorCANId);
-        
-
-        bottomSpinner.setNeutralMode(NeutralModeValue.Coast);
-        middleSpinner.setNeutralMode(NeutralModeValue.Coast);
-        topSpinner.setNeutralMode(NeutralModeValue.Coast);
 
         topSpinnerVelocity = new VelocityVoltage(0);
         middleSpinnerVelocity = new VelocityVoltage(0);
         bottomSpinnerVelocity = new VelocityVoltage(0);
 
-        var config = new Slot0Configs();
-        config.kV = TuningValues.launcherkV;
-        config.kP = TuningValues.launcherkP;
-        config.kI = TuningValues.launcherkI;
-        config.kD = TuningValues.launcherkD;
-
-        topSpinner.getConfigurator().apply(config);
-        middleSpinner.getConfigurator().apply(config);
-        bottomSpinner.getConfigurator().apply(config);
+        configureMotors();
 
     }
 
     public void spinTopFlywheel(LaunchDirection direction) {
-        topSpinnerTargetV = direction == LaunchDirection.AMP ? Preferences.getDouble(Keys.ampUpperV, 9.5) : Preferences.getDouble(Keys.speakerHighAimV, 65);
+        topSpinnerTargetV = direction == LaunchDirection.AMP ? VoltageVelocityValues.ampUpperV : VoltageVelocityValues.speakerHighAimV;
         
 
         topSpinner.setControl(topSpinnerVelocity.withVelocity(topSpinnerTargetV));
@@ -61,11 +50,10 @@ public class LauncherSubsystem extends SubsystemBase{
 
     public void spinMiddleFlywheel(LaunchDirection direction) {
         if (direction != LaunchDirection.LOW) {
-            middleSpinnerTargetV = direction == LaunchDirection.AMP ? Preferences.getDouble(Keys.ampMiddleV, 9.3) : Preferences.getDouble(Keys.speakerHighAimV, 65);
+            middleSpinnerTargetV = direction == LaunchDirection.AMP ? VoltageVelocityValues.ampMiddleV : VoltageVelocityValues.speakerHighAimV;
         }
-
         else {
-            middleSpinnerTargetV = Preferences.getDouble(Keys.speakerLowAimV, -80);
+            middleSpinnerTargetV = VoltageVelocityValues.speakerLowAimV;
         }
         middleSpinner.setControl(middleSpinnerVelocity.withVelocity(middleSpinnerTargetV));
     }
@@ -78,7 +66,7 @@ public class LauncherSubsystem extends SubsystemBase{
 
     public void spinBottomFlywheel() {
 
-        bottomSpinnerTargetV = Preferences.getDouble(Keys.speakerLowAimV, -80);
+        bottomSpinnerTargetV = VoltageVelocityValues.speakerLowAimV;
 
         bottomSpinner.setControl(bottomSpinnerVelocity.withVelocity(bottomSpinnerTargetV));
     }
@@ -103,21 +91,21 @@ public class LauncherSubsystem extends SubsystemBase{
 
         switch (direction) {
             case AMP:
-                middleMaxVelocity = Preferences.getDouble(Keys.ampMiddleV, 8.5);
-                topMaxVelocity = Preferences.getDouble(Keys.ampUpperV, 5.0);
+                middleMaxVelocity = VoltageVelocityValues.ampMiddleV;
+                topMaxVelocity =VoltageVelocityValues.ampUpperV;
                 break;
             
             case HIGH:
-                middleMaxVelocity = Preferences.getDouble(Keys.speakerHighAimV, 65);
-                topMaxVelocity = Preferences.getDouble(Keys.speakerHighAimV, 65);
+                middleMaxVelocity = VoltageVelocityValues.speakerHighAimV;
+                topMaxVelocity = VoltageVelocityValues.speakerHighAimV;
                 break;
 
             default:
-                middleMaxVelocity = Preferences.getDouble(Keys.speakerLowAimV, -80);
-                topMaxVelocity = Preferences.getDouble(Keys.speakerHighAimV, 65);
+                middleMaxVelocity = VoltageVelocityValues.speakerLowAimV;
+                topMaxVelocity = VoltageVelocityValues.speakerHighAimV;
                 break;
         }
-        bottomMaxVelocity = Preferences.getDouble(Keys.speakerLowAimV, -80);
+        bottomMaxVelocity = VoltageVelocityValues.speakerLowAimV;
 
         double bottomSpinnerVelocity = bottomSpinner.getVelocity().getValueAsDouble();
         double topSpinnerVelocity = topSpinner.getVelocity().getValueAsDouble();
@@ -135,12 +123,42 @@ public class LauncherSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        telemetry();
+        //telemetry();
     }
 
-    public void telemetry() {
+    private void telemetry() {
         SmartDashboard.putNumber("Bottom Spinner Speed", bottomSpinner.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Middle Spinner Speed", middleSpinner.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Top Spinner Speed", topSpinner.getVelocity().getValueAsDouble());
+    }
+
+    private void configureMotors() {
+        // bottomSpinner.setNeutralMode(NeutralModeValue.Coast);
+        // middleSpinner.setNeutralMode(NeutralModeValue.Coast);
+        // topSpinner.setNeutralMode(NeutralModeValue.Coast);
+
+        bottomSpinner.setNeutralMode(NeutralModeValue.Brake);
+        middleSpinner.setNeutralMode(NeutralModeValue.Brake);
+        topSpinner.setNeutralMode(NeutralModeValue.Brake);
+
+        var velocityConfig = new Slot0Configs();
+        velocityConfig.kV = TuningValues.launcherkV;
+        velocityConfig.kP = TuningValues.launcherkP;
+        velocityConfig.kI = TuningValues.launcherkI;
+        velocityConfig.kD = TuningValues.launcherkD;
+
+        var rampRateConfig = new ClosedLoopRampsConfigs();
+        rampRateConfig.VoltageClosedLoopRampPeriod = 0.25;
+
+        var topConfig = topSpinner.getConfigurator();
+        var middleConfig = middleSpinner.getConfigurator();
+        var bottomConfig = bottomSpinner.getConfigurator();
+
+        topConfig.apply(velocityConfig);
+        middleConfig.apply(velocityConfig);
+        bottomConfig.apply(velocityConfig);
+        topConfig.apply(rampRateConfig);
+        middleConfig.apply(rampRateConfig);
+        bottomConfig.apply(rampRateConfig);
     }
 }
